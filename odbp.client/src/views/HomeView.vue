@@ -1,6 +1,11 @@
 <template>
-  <utrecht-article>
-    <utrecht-heading :level="1">Het Woo Burgerportaal</utrecht-heading>
+  <section class="hero" :style="`background-image: url(${resources?.image})`">
+    <div class="container">
+      <utrecht-heading :level="1">Het Woo Burgerportaal</utrecht-heading>
+    </div>
+  </section>
+
+  <utrecht-article class="container">
 
     <utrecht-paragraph>
       Zoek hier naar documenten die de gemeente openbaar heeft gemaakt. Deze documenten hebben te
@@ -43,4 +48,26 @@
   </utrecht-article>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { inject } from "vue";
+import type { Resources } from "@/resources";
+
+const resources = inject<Resources>("resources");
+</script>
+
+<style lang="scss" scoped>
+h1 {
+  padding: var(--spacing-large);
+  background-color: var(--utrecht-color-white);
+  inline-size: min(100%, var(--section-width));
+  margin-inline-start: 0;
+}
+
+.hero {
+  padding-block: var(--spacing-extralarge);
+  margin-block-end: var(--spacing-large);
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>

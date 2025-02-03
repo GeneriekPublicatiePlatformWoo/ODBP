@@ -22,6 +22,11 @@
   </nav>
 </template>
 
-<script lang="ts" setup></script>
-
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+nav {
+  margin-inline-end: var(--spacing-default);
+  border: 1px solid var(--utrecht-color-red-40);
+  border-left: none;
+  border-right: none;
+}
+</style>

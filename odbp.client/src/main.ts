@@ -7,6 +7,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import { registerComponents } from "@/components/register";
+import { handleResources } from "./resources";
 
 const app = createApp(App);
 
@@ -14,4 +15,8 @@ app.use(router);
 
 registerComponents(app);
 
-app.mount("#app");
+(async () => {
+    await handleResources(app);
+
+    app.mount("#app");
+})();

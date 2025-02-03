@@ -21,19 +21,18 @@
       </text>
     </svg>
 
-    <utrecht-heading :level="1">Wet Open Overheid Burgerportaal</utrecht-heading>
+    <the-nav />
   </header>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import TheNav from "./TheNav.vue";
+</script>
 
 <style lang="scss" scoped>
 header {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--section-width), 1fr));
-
-  h1 {
-    align-self: center;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
