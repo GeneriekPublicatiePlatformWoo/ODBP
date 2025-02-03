@@ -4,6 +4,8 @@
 @import url("./design-tokens.scss") layer(base);
 
 @layer grid {
+  $breakpoint: 768px; // ..
+  
   html,
   body,
   #app {
@@ -16,7 +18,6 @@
 
   body {
     margin: 0;
-    background-color: var(--utrecht-color-white);
   }
 
   .gpp-woo {
@@ -27,6 +28,33 @@
   .container {
     margin: 0 auto;
     max-width: var(--container-width);
-    padding: 0 var(--spacing-large);
+    padding: 0 var(--spacing-default);
+  }
+
+  header {
+    background-color: var(--utrecht-color-white);
+  }
+  
+  @media screen and (min-width: $breakpoint) {
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--utrecht-color-white);
+    }
+  }
+
+  nav {
+    border: 1px solid var(--utrecht-color-red-40);
+    border-left: none;
+    border-right: none;
+  }
+
+  .hero {
+    padding-block: var(--spacing-extralarge);
+    margin-block-end: var(--spacing-large);
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 }

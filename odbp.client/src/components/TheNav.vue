@@ -17,16 +17,24 @@
             >Zoeken</router-link
           >
         </li>
+
+        <li v-if="resources?.website" class="utrecht-nav-list__item">
+          <a
+            :href="resources.website"
+            title="Website gemeente"
+            class="utrecht-link utrecht-link--html-a utrecht-nav-list__link"
+            target="_blank"
+            >Naar de gemeente</a
+          >
+        </li>
       </ul>
     </div>
   </nav>
 </template>
 
-<style lang="scss" scoped>
-nav {
-  margin-inline-end: var(--spacing-default);
-  border: 1px solid var(--utrecht-color-red-40);
-  border-left: none;
-  border-right: none;
-}
-</style>
+<script setup lang="ts">
+import { inject } from "vue";
+import type { Resources } from "@/resources";
+
+const resources = inject<Resources>("resources");
+</script>

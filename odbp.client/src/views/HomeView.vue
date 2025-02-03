@@ -1,12 +1,11 @@
 <template>
-  <section class="hero" :style="`background-image: url(${resources?.image})`">
+  <section class="hero" :style="resources?.image ? `background-image: url(${resources?.image})` : undefined">
     <div class="container">
       <utrecht-heading :level="1">Het Woo Burgerportaal</utrecht-heading>
     </div>
   </section>
 
   <utrecht-article class="container">
-
     <utrecht-paragraph>
       Zoek hier naar documenten die de gemeente openbaar heeft gemaakt. Deze documenten hebben te
       maken met de ideeën, plannen, regels en afspraken. Zoek op een trefwoord, bijvoorbeeld
@@ -14,8 +13,6 @@
     </utrecht-paragraph>
 
     <utrecht-paragraph>
-      <!-- <utrecht-button appearance="primary-action-button">Zoeken</utrecht-button> -->
-
       <router-link
         :to="{ name: 'zoeken' }"
         class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
@@ -59,15 +56,7 @@ const resources = inject<Resources>("resources");
 h1 {
   padding: var(--spacing-large);
   background-color: var(--utrecht-color-white);
-  inline-size: min(100%, var(--section-width));
+  inline-size: min(75%, var(--section-width));
   margin-inline-start: 0;
-}
-
-.hero {
-  padding-block: var(--spacing-extralarge);
-  margin-block-end: var(--spacing-large);
-  background-position: 50%;
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 </style>

@@ -27,6 +27,8 @@ const setIcon = (href?: string) => {
   link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
 };
 
+const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
+
 const validSources = (sources: (string | undefined)[]) =>
   sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
 
@@ -82,6 +84,8 @@ export const handleResources = async (app: App): Promise<void> => {
   const resources = await getResources();
 
   setIcon(resources?.favicon);
+
+  setTheme(resources?.theme);
 
   await loadCss([resources?.tokens]);
 

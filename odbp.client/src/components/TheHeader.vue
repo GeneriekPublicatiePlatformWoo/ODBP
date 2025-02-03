@@ -4,36 +4,24 @@
 
     <utrecht-skip-link href="#menu">Naar menu</utrecht-skip-link>
 
-    <svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
-      <rect width="90" height="100" fill="white" />
-
-      <polygon points="0,0 90,0 0,100" fill="#c00" />
-
-      <text
-        x="55%"
-        y="85%"
-        text-anchor="middle"
-        font-family="Lucida Grande, Lucida Sans Unicode, Lucida Sans, Arial, sans-serif"
-        font-size="24"
-        fill="#c00"
-      >
-        Gemeente Demodam
-      </text>
-    </svg>
+    <router-link :to="{ name: 'home' }">
+      <img v-if="resources?.logo" :src="resources.logo" alt="Logo" height="100" />
+    </router-link>
 
     <the-nav />
   </header>
 </template>
 
 <script lang="ts" setup>
+import { inject } from "vue";
 import TheNav from "./TheNav.vue";
+import type { Resources } from "@/resources";
+
+const resources = inject<Resources>("resources");
 </script>
 
 <style lang="scss" scoped>
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--utrecht-color-white);
+img {
+  display: block;
 }
 </style>

@@ -13,7 +13,7 @@ app.use(router);
 registerComponents(app);
 
 (async () => {
-    await handleResources(app);
+  await handleResources(app);
 
-    app.mount("#app");
+  app.mount("#app");
 })();
