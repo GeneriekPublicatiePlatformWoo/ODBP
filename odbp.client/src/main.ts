@@ -1,6 +1,3 @@
-import "@utrecht/design-tokens/dist/index.css";
-import "@utrecht/component-library-css";
-import "./assets/design-tokens.scss";
 import "./assets/main.scss";
 
 import { createApp } from "vue";

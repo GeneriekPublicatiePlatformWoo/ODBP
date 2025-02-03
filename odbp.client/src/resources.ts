@@ -20,7 +20,7 @@ const getResources = async (): Promise<Resources> => {
 
 const setIcon = (href?: string) => {
   if (!href) return;
-  
+
   const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
 
   link.href = href;
@@ -30,15 +30,26 @@ const setIcon = (href?: string) => {
 const validSources = (sources: (string | undefined)[]) =>
   sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
 
-const appendCss = async (sources: (string | undefined)[]) => {
+const loadCss = async (sources: (string | undefined)[]) => {
   const promises = validSources(sources).map((href) => {
     return new Promise((resolve, reject) => {
       const link = document.createElement("link");
 
-      link.rel = "stylesheet";
+      link.rel = "preload";
+      link.as = "style";
       link.href = href;
-      link.onload = () => resolve(href);
-      link.onerror = (error) => reject(error);
+
+      link.onload = () => {
+        const style = document.createElement("style");
+
+        style.textContent = `@import url("${href}") layer(main);`;
+
+        document.head.appendChild(style);
+
+        resolve(href);
+      };
+
+      link.onerror = () => reject(href);
 
       document.head.appendChild(link);
     });
@@ -46,6 +57,7 @@ const appendCss = async (sources: (string | undefined)[]) => {
 
   const results = await Promise.allSettled(promises);
 
+  // ...
   results.forEach((result) => console.log(result));
 };
 
@@ -56,12 +68,13 @@ const preloadImages = async (sources: (string | undefined)[]) => {
 
       img.src = src;
       img.onload = () => resolve(src);
-      img.onerror = (error) => reject(error);
+      img.onerror = () => reject(src);
     });
   });
 
   const results = await Promise.allSettled(promises);
 
+  // ...
   results.forEach((result) => console.log(result));
 };
 
@@ -70,7 +83,7 @@ export const handleResources = async (app: App): Promise<void> => {
 
   setIcon(resources?.favicon);
 
-  await appendCss([resources?.tokens]);
+  await loadCss([resources?.tokens]);
 
   await preloadImages([resources?.logo, resources?.image]);
 

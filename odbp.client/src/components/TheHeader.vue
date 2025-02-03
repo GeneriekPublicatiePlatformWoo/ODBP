@@ -34,5 +34,6 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: var(--utrecht-color-white);
 }
 </style>

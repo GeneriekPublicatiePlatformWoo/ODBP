@@ -1,25 +1,32 @@
-html,
-body,
-#app {
-  height: 100%;
-}
+@layer base, grid, main;
+@import url("@utrecht/design-tokens/dist/index.css") layer(base);
+@import url("@utrecht/component-library-css") layer(base);
+@import url("./design-tokens.scss") layer(base);
 
-html {
-  scroll-behavior: smooth;
-}
+@layer grid {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
 
-body {
-  margin: 0;
-  background-color: var(--utrecht-color-white);
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-.gpp-woo {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-}
+  body {
+    margin: 0;
+    background-color: var(--utrecht-color-white);
+  }
 
-.container {
-  margin: 0 auto;
-  max-width: var(--container-width);
-  padding: 0 var(--spacing-large)
+  .gpp-woo {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .container {
+    margin: 0 auto;
+    max-width: var(--container-width);
+    padding: 0 var(--spacing-large);
+  }
 }
