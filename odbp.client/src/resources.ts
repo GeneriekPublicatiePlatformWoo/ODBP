@@ -34,7 +34,7 @@ const validSources = (sources: (string | undefined)[]) =>
 
 const loadCss = async (sources: (string | undefined)[]) => {
   const promises = validSources(sources).map((href) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<{ href: string }>((resolve, reject) => {
       const link = document.createElement("link");
 
       link.rel = "preload";
@@ -48,10 +48,10 @@ const loadCss = async (sources: (string | undefined)[]) => {
 
         document.head.appendChild(style);
 
-        resolve(href);
+        resolve({ href });
       };
 
-      link.onerror = () => reject(href);
+      link.onerror = () => reject({ href });
 
       document.head.appendChild(link);
     });
@@ -59,37 +59,48 @@ const loadCss = async (sources: (string | undefined)[]) => {
 
   const results = await Promise.allSettled(promises);
 
-  // ...
-  results.forEach((result) => console.log(result));
+  if (results.some((result) => result.status === "rejected")) {
+    throw new Error();
+  }
 };
 
 const preloadImages = async (sources: (string | undefined)[]) => {
   const promises = validSources(sources).map((src) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<{ src: string }>((resolve, reject) => {
       const img = new Image();
 
       img.src = src;
-      img.onload = () => resolve(src);
-      img.onerror = () => reject(src);
+      img.onload = () => resolve({ src });
+      img.onerror = () => reject({ src });
     });
   });
 
   const results = await Promise.allSettled(promises);
 
-  // ...
-  results.forEach((result) => console.log(result));
+  const rejected = results.filter((result) => result.status === "rejected");
+
+  if (rejected.length) throw new Error(rejected.map((r) => r.reason.src).join(", "));
 };
 
 export const handleResources = async (app: App): Promise<void> => {
   const resources = await getResources();
 
-  setIcon(resources?.favicon);
+  setIcon(resources.favicon);
+  setTheme(resources.theme);
 
-  setTheme(resources?.theme);
+  try {
+    await loadCss([resources.tokens]);
+  } catch {
+    // ...
+    console.error(`LoadCss failed`);
+  }
 
-  await loadCss([resources?.tokens]);
-
-  await preloadImages([resources?.logo, resources?.image]);
+  try {
+    await preloadImages([resources.logo, resources.image]);
+  } catch (error) {
+    // ...
+    console.error(`PreloadImages ${error}`);
+  }
 
   app.provide("resources", resources);
 };
