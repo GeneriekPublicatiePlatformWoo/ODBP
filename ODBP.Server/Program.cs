@@ -42,9 +42,7 @@ try
     builder.Services.AddOutputCache(x=> x.AddPolicy(OutputCachePolicies.Sitemap, 
         b=> b.Expire(TimeSpan.FromHours(cacheExpiryHours))));
 
-    var resourcesConfig = new ResourcesConfig();
-    resourcesConfig.SetValues(builder.Configuration);
-    builder.Services.AddSingleton(resourcesConfig);
+    builder.Services.AddSingleton<ResourcesConfig>();
 
     var app = builder.Build();
 
