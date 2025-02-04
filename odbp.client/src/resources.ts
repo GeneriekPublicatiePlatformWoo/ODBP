@@ -77,8 +77,8 @@ export const handleResources = async (app: App): Promise<void> => {
 
     setIcon(resources.favicon);
 
-		// Make references to resources available for app when all preloads are fulfilled
-		app.provide("resources", resources);
+    // Make references to resources available for app when all preloads are fulfilled
+    app.provide("resources", resources);
   } catch (error) {
     console.error(`One or more external resources failed to load. ${error}`);
   }

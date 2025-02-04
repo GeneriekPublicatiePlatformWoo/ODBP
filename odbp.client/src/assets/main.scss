@@ -1,5 +1,5 @@
 @layer base, grid, main;
-@import url("@utrecht/design-tokens/dist/index.css") layer(base);
+
 @import url("@utrecht/component-library-css") layer(base);
 @import url("./design-tokens.scss") layer(base);
 
@@ -20,7 +20,7 @@
     margin: 0;
   }
 
-  .gpp-woo {
+  .gpp-woo-theme {
     display: grid;
     grid-template-rows: auto 1fr auto;
   }

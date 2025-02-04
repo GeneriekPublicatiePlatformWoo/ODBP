@@ -1,4 +1,10 @@
-.gpp-woo {
+@use "@utrecht/design-tokens/dist/mixin-theme" as mixin;
+
+.gpp-woo-theme {
+  @include mixin.utrecht-theme;
+
+  --utrecht-space-around: 1;
+
   // spacing
   --container-width: 80rem;
   --container-padding: max(var(--spacing-large), calc(50vw - var(--container-width) / 2));
@@ -10,8 +16,4 @@
   --spacing-default: 1rem;
   --spacing-large: 2rem;
   --spacing-extralarge: 6rem;
-}
-
-.utrecht-theme {
-  --utrecht-space-around: 1;
 }
