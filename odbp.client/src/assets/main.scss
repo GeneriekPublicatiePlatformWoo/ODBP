@@ -4,7 +4,7 @@
 @import url("./design-tokens.scss") layer(base);
 
 @layer grid {
-  $breakpoint: 768px; // ..
+  $breakpoint: 48rem;
 
   html,
   body,

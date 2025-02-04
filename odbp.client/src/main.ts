@@ -13,6 +13,7 @@ app.use(router);
 registerComponents(app);
 
 (async () => {
+  // Load external theme resources before app mounts to prevent layout shifts
   await handleResources(app);
 
   app.mount("#app");

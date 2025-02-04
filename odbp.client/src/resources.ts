@@ -18,6 +18,8 @@ const getResources = async (): Promise<Resources> => {
   }
 };
 
+const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
+
 const setIcon = (href?: string) => {
   if (!href) return;
 
@@ -27,26 +29,27 @@ const setIcon = (href?: string) => {
   link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
 };
 
-const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
-
 const validSources = (sources: (string | undefined)[]) =>
   sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
 
-const loadCss = async (sources: (string | undefined)[]) => {
+const addCssRefToMainLayer = (href: string) =>
+  document.head.appendChild(
+    Object.assign(document.createElement("style"), {
+      textContent: `@import url("${href}") layer(main);`
+    })
+  );
+
+const preloadResources = async (sources: (string | undefined)[]) => {
   const promises = validSources(sources).map((href) => {
     return new Promise<{ href: string }>((resolve, reject) => {
       const link = document.createElement("link");
 
       link.rel = "preload";
-      link.as = "style";
+      link.as = href.endsWith(".css") ? "style" : "image";
       link.href = href;
 
       link.onload = () => {
-        const style = document.createElement("style");
-
-        style.textContent = `@import url("${href}") layer(main);`;
-
-        document.head.appendChild(style);
+        link.as === "style" && addCssRefToMainLayer(href);
 
         resolve({ href });
       };
@@ -59,48 +62,24 @@ const loadCss = async (sources: (string | undefined)[]) => {
 
   const results = await Promise.allSettled(promises);
 
-  if (results.some((result) => result.status === "rejected")) {
-    throw new Error();
-  }
-};
-
-const preloadImages = async (sources: (string | undefined)[]) => {
-  const promises = validSources(sources).map((src) => {
-    return new Promise<{ src: string }>((resolve, reject) => {
-      const img = new Image();
-
-      img.src = src;
-      img.onload = () => resolve({ src });
-      img.onerror = () => reject({ src });
-    });
-  });
-
-  const results = await Promise.allSettled(promises);
-
   const rejected = results.filter((result) => result.status === "rejected");
 
-  if (rejected.length) throw new Error(rejected.map((r) => r.reason.src).join(", "));
+  if (rejected.length) throw new Error(rejected.map((r) => r.reason.href).join(", "));
 };
 
 export const handleResources = async (app: App): Promise<void> => {
   const resources = await getResources();
 
-  setIcon(resources.favicon);
-  setTheme(resources.theme);
-
   try {
-    await loadCss([resources.tokens]);
-  } catch {
-    // ...
-    console.error(`LoadCss failed`);
-  }
+    await preloadResources([resources.tokens, resources.logo, resources.image]);
 
-  try {
-    await preloadImages([resources.logo, resources.image]);
+    setTheme(resources.theme);
+
+    setIcon(resources.favicon);
+
+		// Make references to resources available for app when all preloads are fulfilled
+		app.provide("resources", resources);
   } catch (error) {
-    // ...
-    console.error(`PreloadImages ${error}`);
+    console.error(`One or more external resources failed to load. ${error}`);
   }
-
-  app.provide("resources", resources);
 };

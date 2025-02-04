@@ -1,5 +1,6 @@
 ﻿using ODBP.Apis.Odrc;
 using ODBP.Config;
+using ODBP.Features;
 using ODBP.Features.Sitemap;
 using Serilog;
 using Serilog.Events;
@@ -40,6 +41,10 @@ try
 
     builder.Services.AddOutputCache(x=> x.AddPolicy(OutputCachePolicies.Sitemap, 
         b=> b.Expire(TimeSpan.FromHours(cacheExpiryHours))));
+
+    var resourcesConfig = new ResourcesConfig();
+    resourcesConfig.SetValues(builder.Configuration);
+    builder.Services.AddSingleton(resourcesConfig);
 
     var app = builder.Build();
 

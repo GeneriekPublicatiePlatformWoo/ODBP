@@ -1,4 +1,4 @@
-﻿using System;
+﻿using ODBP.Features;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -6,19 +6,18 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static IApplicationBuilder UseOdbpSecurityHeaders(this WebApplication app)
         {
-            var configuration = app.Services.GetRequiredService<IConfiguration>();
-            var resources = configuration.GetSection("EXTERNAL_RESOURCES");
-  
+            var resourcesConfig = app.Services.GetRequiredService<ResourcesConfig>();
+
             var styleSources = new List<string?> {
                 "'self'",
-                Uri.TryCreate(resources["GEMEENTE_DESIGN_TOKENS_LINK"], UriKind.Absolute, out var tokens) ? tokens.ToString() : null
+                resourcesConfig.Tokens
             };
 
             var imgSources = new List<string?> {
                 "'self'",
-                Uri.TryCreate(resources["GEMEENTE_LOGO_LINK"], UriKind.Absolute, out var logo) ? logo.ToString() : null,
-                Uri.TryCreate(resources["GEMEENTE_FAVICON_LINK"], UriKind.Absolute, out var favicon) ? favicon.ToString() : null,
-                Uri.TryCreate(resources["GEMEENTE_MAIN_IMAGE_LINK"], UriKind.Absolute, out var image) ? image.ToString() : null
+                resourcesConfig.Logo,
+                resourcesConfig.Favicon,
+                resourcesConfig.Image
             };
 
             return app.UseSecurityHeaders(x => x
