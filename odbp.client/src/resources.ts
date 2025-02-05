@@ -1,7 +1,7 @@
 import type { App } from "vue";
 
 export type Resources = Partial<{
-	name: string;
+  name: string;
   website: string;
   logo: string;
   favicon: string;
@@ -70,7 +70,7 @@ export const loadThemeResources = async (app: App): Promise<void> => {
   try {
     await preloadResources([resources.tokens, resources.logo, resources.image]);
 
-		addTokensToLayer(resources.tokens);
+    addTokensToLayer(resources.tokens);
     setIcon(resources.favicon);
     setTheme(resources.theme);
 

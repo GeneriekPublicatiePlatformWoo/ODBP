@@ -3,7 +3,7 @@
 @import url("@utrecht/component-library-css") layer(base);
 
 @layer layout {
-  $breakpoint: 48rem;
+  $breakpoint-md: 48rem;
 
   html,
   body,
@@ -31,7 +31,7 @@
       display: block;
     }
 
-    @media screen and (min-width: $breakpoint) {
+    @media screen and (min-width: $breakpoint-md) {
       & {
         display: flex;
         justify-content: space-between;
