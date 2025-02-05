@@ -4,7 +4,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import { registerComponents } from "@/components/register";
-import { handleResources } from "./resources";
+import { loadThemeResources } from "./resources";
 
 const app = createApp(App);
 
@@ -14,7 +14,7 @@ registerComponents(app);
 
 (async () => {
   // Load external theme resources before app mounts to prevent layout shifts
-  await handleResources(app);
+  await loadThemeResources(app);
 
   app.mount("#app");
 })();

@@ -4,6 +4,7 @@
     {
         private readonly IConfiguration _configuration = configuration;
 
+        public string? Name => !string.IsNullOrWhiteSpace(_configuration["RESOURCES:GEMEENTE_NAAM"]) ? _configuration["RESOURCES:GEMEENTE_NAAM"] : null;
         public string? Website => Uri.TryCreate(_configuration["RESOURCES:GEMEENTE_WEBSITE"], UriKind.Absolute, out var uri) ? uri.ToString() : null;
         public string? Logo => Uri.TryCreate(_configuration["RESOURCES:GEMEENTE_LOGO"], UriKind.Absolute, out var uri) ? uri.ToString() : null;
         public string? Favicon => Uri.TryCreate(_configuration["RESOURCES:GEMEENTE_FAVICON"], UriKind.Absolute, out var uri) ? uri.ToString() : null;

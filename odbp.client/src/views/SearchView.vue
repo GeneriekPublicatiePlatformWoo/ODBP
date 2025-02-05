@@ -1,5 +1,5 @@
 <template>
-  <utrecht-article class="container">
+  <utrecht-article>
     <utrecht-heading :level="1">Zoeken</utrecht-heading>
 
     <form class="utrecht-form">

@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <utrecht-page-header>
     <utrecht-skip-link href="#main">Naar inhoud</utrecht-skip-link>
 
     <utrecht-skip-link href="#menu">Naar menu</utrecht-skip-link>
@@ -9,7 +9,7 @@
     </router-link>
 
     <the-nav />
-  </header>
+  </utrecht-page-header>
 </template>
 
 <script lang="ts" setup>
@@ -19,9 +19,3 @@ import type { Resources } from "@/resources";
 
 const resources = inject<Resources>("resources");
 </script>
-
-<style lang="scss" scoped>
-img {
-  display: block;
-}
-</style>
