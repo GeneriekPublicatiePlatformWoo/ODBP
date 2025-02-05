@@ -7,7 +7,7 @@
       <div class="gpp-woo-card">
         <div class="gpp-woo-card-content">
           <span class="utrecht-heading-2"
-            >Open {{ naam }}, zoek hier in openbaar gemaakte informatie de van
+            >Open {{ naam }}, zoek hier in openbaar gemaakte informatie van
             Gemeente {{ naam }}</span
           >
 
