@@ -1,6 +1,8 @@
 import type { App } from "vue";
 
 import {
+  PageHeader as UtrechtPageHeader,
+  PageFooter as UtrechtPageFooter,
   SkipLink as UtrechtSkipLink,
   Article as UtrechtArticle,
   Heading as UtrechtHeading,
@@ -13,16 +15,22 @@ import {
   Textbox as UtrechtTextbox
 } from "@utrecht/component-library-vue";
 
-export const registerComponents = (app: App): void => {
-  app
-    .component("UtrechtSkipLink", UtrechtSkipLink)
-    .component("UtrechtArticle", UtrechtArticle)
-    .component("UtrechtHeading", UtrechtHeading)
-    .component("UtrechtParagraph", UtrechtParagraph)
-    .component("UtrechtUnorderedList", UtrechtUnorderedList)
-    .component("UtrechtUnorderedListItem", UtrechtUnorderedListItem)
-    .component("UtrechtButton", UtrechtButton)
-    .component("UtrechtFormField", UtrechtFormField)
-    .component("UtrechtFormLabel", UtrechtFormLabel)
-    .component("UtrechtTextbox", UtrechtTextbox);
-};
+const components = {
+  UtrechtPageHeader,
+  UtrechtPageFooter,
+  UtrechtSkipLink,
+  UtrechtArticle,
+  UtrechtHeading,
+  UtrechtParagraph,
+  UtrechtUnorderedList,
+  UtrechtUnorderedListItem,
+  UtrechtButton,
+  UtrechtFormField,
+  UtrechtFormLabel,
+  UtrechtTextbox
+} as const;
+
+export type OurComponents = typeof components;
+
+export const registerComponents = (app: App): void =>
+  Object.entries(components).forEach(([key, value]) => app.component(key, value));

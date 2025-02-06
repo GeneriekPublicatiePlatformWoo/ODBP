@@ -1,0 +1,16 @@
+<svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="90" height="100" fill="transparent" />
+
+  <polygon points="0,0 90,0 0,100" fill="hsl(211 60% 35%)" />
+
+  <text
+    x="55%"
+    y="88%"
+    text-anchor="middle"
+    font-family="Lucida Grande, Lucida Sans Unicode, Lucida Sans, Arial, sans-serif"
+    font-size="24"
+    fill="hsl(211 60% 35%)"
+  >
+    Gemeente Demodam
+  </text>
+</svg>

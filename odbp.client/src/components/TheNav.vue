@@ -10,11 +10,21 @@
           >
         </li>
 
-        <li class="utrecht-nav-list__item">
+        <!-- <li class="utrecht-nav-list__item">
           <router-link
             :to="{ name: 'zoeken' }"
             class="utrecht-link utrecht-link--html-a utrecht-nav-list__link"
             >Zoeken</router-link
+          >
+        </li> -->
+
+        <li v-if="resources?.website" class="utrecht-nav-list__item">
+          <a
+            :href="resources.website"
+            title="Website gemeente"
+            class="utrecht-link utrecht-link--html-a utrecht-nav-list__link"
+            target="_blank"
+            >Naar de gemeente</a
           >
         </li>
       </ul>
@@ -22,6 +32,8 @@
   </nav>
 </template>
 
-<script lang="ts" setup></script>
+<script setup lang="ts">
+import { injectResources } from "@/resources";
 
-<style lang="scss" scoped></style>
+const resources = injectResources();
+</script>

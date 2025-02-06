@@ -1,29 +1,44 @@
-html,
-body,
-#app {
-  height: 100%;
-}
+// Add project css to layers to be sure that the imported external tokens
+// take highest precedence as they are loaded as unlayered css
+@layer base, layout;
+@import url("./design-tokens.scss") layer(base);
+@import url("@utrecht/component-library-css") layer(base);
 
-html {
-  scroll-behavior: smooth;
-}
+@layer layout {
+  $breakpoint-md: 48rem;
 
-body {
-  margin: 0;
-}
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
 
-#app {
-  display: grid;
-  grid-template-columns: 1fr min(var(--container-width), 90%) 1fr;
-  grid-template-rows: auto auto 1fr auto;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-#app > * {
-  grid-column: 2;
-  background-color: var(--color-white);
-  padding: var(--spacing-default);
-}
+  body {
+    margin: 0;
+  }
 
-.utrecht-theme {
-  --utrecht-space-around: 1;
+  #app {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  header {
+    padding-inline: 0;
+
+    img {
+      display: block;
+    }
+
+    @media screen and (min-width: $breakpoint-md) {
+      & {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
+  }
 }
