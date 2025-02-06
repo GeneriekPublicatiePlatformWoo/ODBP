@@ -43,7 +43,7 @@ Op dit moment is de implementatie gebaseerd op alleen het Utrecht Design System,
 | **Navigation bar** (`utrecht-nav-bar`)        | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-nav-bar--design-tokens)        |
 | **Skip link** (`utrecht-skip-link`)           | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-skip-link--design-tokens)      |
 | **Article** (`utrecht-article`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-article--design-tokens)        |
-| **Heading** (`utrecht-heading`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-heading--design-tokens)        |
+| **Heading** (`utrecht-heading`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-heading-1--design-tokens)        |
 | **Paragraph** (`utrecht-paragraph`)           | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-paragraph--design-tokens)      |
 | **Unordered list** (`utrecht-unordered-list`) | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-unordered-list--design-tokens) |
 | **Button** (`utrecht-button`)                 | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-button--design-tokens)         |
