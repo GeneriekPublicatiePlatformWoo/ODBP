@@ -5,15 +5,18 @@
 
   --utrecht-space-around: 1;
 
-  // spacing
-  --container-width: 80rem;
-  --container-padding: max(var(--spacing-large), calc(50vw - var(--container-width) / 2));
-  --section-width: 30.75rem;
-  --section-width-small: 20rem;
-  --section-width-large: 60rem;
-  --spacing-extrasmall: 0.25rem;
-  --spacing-small: 0.5rem;
-  --spacing-default: 1rem;
-  --spacing-large: 2rem;
-  --spacing-extralarge: 6rem;
+  --utrecht-page-header-padding-block-start: 2px;
+  --utrecht-page-header-padding-block-end: 2px;
+  --utrecht-page-header-background-color: var(--utrecht-color-white);
+  --utrecht-nav-bar-background-color: transparent;
+
+  --utrecht-unordered-list-marker-color: var(--utrecht-color-blue-35);
+  
+  --utrecht-page-footer-background-color: var(--utrecht-color-blue-35);
+  --utrecht-page-footer-background-image: none;
+
+  --gpp-woo-card-max-inline-size: calc(var(--utrecht-page-max-inline-size) / 2);
+  --gpp-woo-card-background-color: var(--utrecht-surface-background-color);
+  --gpp-woo-card-content-padding-block: var(--utrecht-space-block-2xl);
+  --gpp-woo-card-content-padding-inline: var(--utrecht-space-inline-2xl);
 }

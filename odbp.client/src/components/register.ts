@@ -1,6 +1,8 @@
 import type { App } from "vue";
 
 import {
+  PageHeader as UtrechtPageHeader,
+  PageFooter as UtrechtPageFooter,
   SkipLink as UtrechtSkipLink,
   Article as UtrechtArticle,
   Heading as UtrechtHeading,
@@ -15,6 +17,8 @@ import {
 
 export const registerComponents = (app: App): void => {
   app
+    .component("UtrechtPageHeader", UtrechtPageHeader)
+    .component("UtrechtPageFooter", UtrechtPageFooter)
     .component("UtrechtSkipLink", UtrechtSkipLink)
     .component("UtrechtArticle", UtrechtArticle)
     .component("UtrechtHeading", UtrechtHeading)

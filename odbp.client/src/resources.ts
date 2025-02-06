@@ -1,6 +1,7 @@
 import type { App } from "vue";
 
 export type Resources = Partial<{
+  name: string;
   website: string;
   logo: string;
   favicon: string;
@@ -29,15 +30,16 @@ const setIcon = (href?: string) => {
   link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
 };
 
-const validSources = (sources: (string | undefined)[]) =>
-  sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
-
-const addCssRefToMainLayer = (href: string) =>
+const importTokensIntoLayer = (url?: string) =>
+  url &&
   document.head.appendChild(
     Object.assign(document.createElement("style"), {
-      textContent: `@import url("${href}") layer(main);`
+      textContent: `@import url("${url}") layer(main);`
     })
   );
+
+const validSources = (sources: (string | undefined)[]) =>
+  sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
 
 const preloadResources = async (sources: (string | undefined)[]) => {
   const promises = validSources(sources).map((href) => {
@@ -48,12 +50,7 @@ const preloadResources = async (sources: (string | undefined)[]) => {
       link.as = href.endsWith(".css") ? "style" : "image";
       link.href = href;
 
-      link.onload = () => {
-        link.as === "style" && addCssRefToMainLayer(href);
-
-        resolve({ href });
-      };
-
+      link.onload = () => resolve({ href });
       link.onerror = () => reject({ href });
 
       document.head.appendChild(link);
@@ -67,15 +64,16 @@ const preloadResources = async (sources: (string | undefined)[]) => {
   if (rejected.length) throw new Error(rejected.map((r) => r.reason.href).join(", "));
 };
 
-export const handleResources = async (app: App): Promise<void> => {
+export const loadThemeResources = async (app: App): Promise<void> => {
   const resources = await getResources();
 
   try {
     await preloadResources([resources.tokens, resources.logo, resources.image]);
 
-    setTheme(resources.theme);
+    importTokensIntoLayer(resources.tokens);
 
     setIcon(resources.favicon);
+    setTheme(resources.theme);
 
     // Make references to resources available for app when all preloads are fulfilled
     app.provide("resources", resources);
