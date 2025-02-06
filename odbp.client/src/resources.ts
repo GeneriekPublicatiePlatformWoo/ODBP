@@ -1,4 +1,4 @@
-import type { App } from "vue";
+import { inject, type App } from "vue";
 
 export type Resources = Partial<{
   name: string;
@@ -9,6 +9,8 @@ export type Resources = Partial<{
   tokens: string;
   theme: string;
 }>;
+
+export const injectResources = () => inject<Resources>("resources");
 
 const getResources = async (): Promise<Resources> => {
   try {
@@ -30,24 +32,16 @@ const setIcon = (href?: string) => {
   link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
 };
 
-const importTokensIntoLayer = (url?: string) =>
-  url &&
-  document.head.appendChild(
-    Object.assign(document.createElement("style"), {
-      textContent: `@import url("${url}") layer(main);`
-    })
-  );
-
 const validSources = (sources: (string | undefined)[]) =>
   sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
 
-const preloadResources = async (sources: (string | undefined)[]) => {
+const loadResources = async (sources: (string | undefined)[]) => {
   const promises = validSources(sources).map((href) => {
     return new Promise<{ href: string }>((resolve, reject) => {
       const link = document.createElement("link");
 
-      link.rel = "preload";
-      link.as = href.endsWith(".css") ? "style" : "image";
+      link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
+      link.rel === "preload" && (link.as = "image");
       link.href = href;
 
       link.onload = () => resolve({ href });
@@ -59,25 +53,34 @@ const preloadResources = async (sources: (string | undefined)[]) => {
 
   const results = await Promise.allSettled(promises);
 
-  const rejected = results.filter((result) => result.status === "rejected");
+  const rejected = results.filter(
+    (result): result is PromiseRejectedResult => result.status === "rejected"
+  );
 
   if (rejected.length) throw new Error(rejected.map((r) => r.reason.href).join(", "));
 };
 
 export const loadThemeResources = async (app: App): Promise<void> => {
+  // First fetch the references to external resources from the API
   const resources = await getResources();
 
   try {
-    await preloadResources([resources.tokens, resources.logo, resources.image]);
+    // Then load the external resources if provided: theme tokens, logo, and image
+    // (this is done before mounting the app to prevent layout shifts)
+    // Tokens will be loaded directly (as unlayered css, to be sure it takes precedence over the layered project css)
+    // Images will be preloaded, waiting to be referenced from the app
+    await loadResources([resources.tokens, resources.logo, resources.image]);
 
-    importTokensIntoLayer(resources.tokens);
-
+    // Replace the provided favicon link
     setIcon(resources.favicon);
+
+    // Apply the associated theme class to the root element of the app
     setTheme(resources.theme);
 
-    // Make references to resources available for app when all preloads are fulfilled
+    // Provide references to the loaded resources to the app
     app.provide("resources", resources);
   } catch (error) {
+    // Log an error if any external resources fail to load
     console.error(`One or more external resources failed to load. ${error}`);
   }
 };

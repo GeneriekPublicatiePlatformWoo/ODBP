@@ -25,10 +25,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue";
-import type { Resources } from "@/resources";
+import { computed } from "vue";
+import { injectResources } from "@/resources";
 
-const resources = inject<Resources>("resources");
+const resources = injectResources();
 const naam = computed(() => resources?.name ? resources.name : "-");
 </script>
 
