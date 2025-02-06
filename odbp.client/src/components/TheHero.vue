@@ -1,14 +1,18 @@
 <template>
-  <section
-    class="gpp-woo-main-image"
-    :style="resources?.image ? `background-image: url(${resources?.image})` : undefined"
-  >
+  <section class="gpp-woo-hero">
     <div class="utrecht-page utrecht-page-content">
+      <img
+        v-if="resources?.image"
+        :src="resources.image"
+        class="gpp-woo-hero-image"
+        alt="Afbeelding gemeente"
+      />
+
       <div class="gpp-woo-card">
         <div class="gpp-woo-card-content">
           <span class="utrecht-heading-2"
-            >Open {{ naam }}, zoek hier in openbaar gemaakte informatie van
-            Gemeente {{ naam }}</span
+            >Open {{ naam }}, zoek hier in openbaar gemaakte informatie van Gemeente
+            {{ naam }}</span
           >
 
           <utrecht-paragraph>
@@ -29,14 +33,24 @@ import { computed } from "vue";
 import { injectResources } from "@/resources";
 
 const resources = injectResources();
-const naam = computed(() => resources?.name ? resources.name : "-");
+const naam = computed(() => (resources?.name ? resources.name : "-"));
 </script>
 
 <style lang="scss" scoped>
-.gpp-woo-main-image {
-  background-position: 50%;
-  background-repeat: no-repeat;
-  background-size: cover;
+.gpp-woo-hero {
+  position: relative;
+
+  .gpp-woo-hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gpp-woo-card {
+    position: relative;
+  }
 }
 
 .gpp-woo-card {
