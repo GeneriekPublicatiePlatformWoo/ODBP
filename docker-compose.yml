@@ -5,4 +5,4 @@ services:
       context: .
       dockerfile: ODBP.Server/Dockerfile
     ports:
-      - "8080"
+      - "53997:8080"

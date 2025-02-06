@@ -5,7 +5,7 @@
     <utrecht-skip-link href="#menu">Naar menu</utrecht-skip-link>
 
     <router-link :to="{ name: 'home' }">
-      <img v-if="resources?.logo" :src="resources.logo" alt="Logo" height="100" />
+      <img v-if="resources?.logo" :src="resources.logo" alt="Logo" height="100" crossorigin="anonymous" />
     </router-link>
 
     <the-nav />
