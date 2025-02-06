@@ -43,7 +43,6 @@ const loadResources = async (sources: (string | undefined)[]) => {
       link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
       link.rel === "preload" && (link.as = "image");
       link.href = href;
-      link.crossOrigin = "anonymous";
 
       link.onload = () => resolve({ href });
       link.onerror = () => reject({ href });

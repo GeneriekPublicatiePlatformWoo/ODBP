@@ -1,7 +1,12 @@
 <template>
-  <section class="gpp-woo-main-container">
+  <section class="gpp-woo-hero">
     <div class="utrecht-page utrecht-page-content">
-      <img v-if="resources?.image" :src="resources.image" class="gpp-woo-main-image" crossorigin="anonymous" />
+      <img
+        v-if="resources?.image"
+        :src="resources.image"
+        class="gpp-woo-hero-image"
+        alt="Afbeelding gemeente"
+      />
 
       <div class="gpp-woo-card">
         <div class="gpp-woo-card-content">
@@ -32,10 +37,10 @@ const naam = computed(() => (resources?.name ? resources.name : "-"));
 </script>
 
 <style lang="scss" scoped>
-.gpp-woo-main-container {
+.gpp-woo-hero {
   position: relative;
 
-  .gpp-woo-main-image {
+  .gpp-woo-hero-image {
     position: absolute;
     inset: 0;
     width: 100%;
