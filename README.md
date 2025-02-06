@@ -18,21 +18,32 @@
 
 ## NLDS – NL Design System
 
-De interface van dit portaal is opgebouwd met componenten uit het **NL Design System (NLDS)**. Dit is een verzameling ontwerp- en ontwikkelrichtlijnen voor digitale overheidsdiensten in Nederland. Door gebruik te maken van NLDS-componenten blijft de gebruikerservaring consistent en toegankelijk, in lijn met de standaarden van de overheid.
+De interface van het Burgerportaal is opgebouwd met componenten uit het **NL Design System (NLDS)**. Dit is een verzameling ontwerp- en ontwikkelrichtlijnen voor digitale overheidsdiensten in Nederland. Door gebruik te maken van NLDS-componenten blijft de gebruikerservaring consistent en toegankelijk, in lijn met de standaarden van de overheid.
 
 🔗 Meer informatie: [Introductie NLDS](https://nldesignsystem.nl/handboek/introductie)
 
 ### Aanpasbaarheid voor gemeentes
 
-Dankzij NLDS kunnen verschillende installaties van dit portaal eenvoudig worden aangepast aan de huisstijl van diverse gemeentes. Dit wordt mogelijk gemaakt door het gebruik van design tokens, die de stijlkenmerken zoals kleuren, typografie en componenten bepalen.
+Dankzij NLDS kunnen verschillende installaties van het Burgerportaal eenvoudig worden aangepast aan de huisstijl van diverse gemeentes. Dit wordt mogelijk gemaakt door het gebruik van design tokens, die de stijlkenmerken zoals kleuren, typografie en componenten bepalen.
 
 ### Implementatie op basis van Utrecht Design System
 
-Op dit moment is de implementatie gebaseerd op gemeentes alleen het Utrecht Design System, een specifieke variant van NLDS. Voor een correcte weergave en de beste resultaten moeten ten minste de Brand en Common tokens correct ingevuld zijn.
+Op dit moment is de implementatie gebaseerd op alleen het Utrecht Design System, een specifieke variant van NLDS. Voor een correcte weergave en de beste resultaten moeten ten minste de Brand en Common tokens correct ingevuld zijn.
 
 ### Gebruikte CSS-componenten
 
-| Component                         | Storybook                                                                                                             |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Document** (`utrecht-document`) | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-document--design-tokens) |
-| **Surface** (`utrecht-surface`)   | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-surface--design-tokens)  |
+| Component                                     | Storybook                                                                                                                   |
+| :-------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| **Document** (`utrecht-document`)             | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-document--design-tokens)       |
+| **Surface** (`utrecht-surface`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-surface--design-tokens)        |
+| **Page** (`utrecht-page`)                     | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-page--design-tokens)           |
+| **Page header** (`utrecht-page-header`)       | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-page-header--design-tokens)    |
+| **Page content** (`utrecht-page-content`)     | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-page-content--design-tokens)   |
+| **Page footer** (`utrecht-page-footer`)       | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-page-footer--design-tokens)    |
+| **Navigation bar** (`utrecht-nav-bar`)        | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-nav-bar--design-tokens)        |
+| **Skip link** (`utrecht-skip-link`)           | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-skip-link--design-tokens)      |
+| **Article** (`utrecht-article`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-article--design-tokens)        |
+| **Heading** (`utrecht-heading`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-heading--design-tokens)        |
+| **Paragraph** (`utrecht-paragraph`)           | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-paragraph--design-tokens)      |
+| **Unordered list** (`utrecht-unordered-list`) | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-unordered-list--design-tokens) |
+| **Button** (`utrecht-button`)                 | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-button--design-tokens)         |

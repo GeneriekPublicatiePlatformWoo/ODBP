@@ -30,7 +30,7 @@ const setIcon = (href?: string) => {
   link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
 };
 
-const addTokensToLayer = (url?: string) =>
+const importTokensIntoLayer = (url?: string) =>
   url &&
   document.head.appendChild(
     Object.assign(document.createElement("style"), {
@@ -70,7 +70,8 @@ export const loadThemeResources = async (app: App): Promise<void> => {
   try {
     await preloadResources([resources.tokens, resources.logo, resources.image]);
 
-    addTokensToLayer(resources.tokens);
+    importTokensIntoLayer(resources.tokens);
+
     setIcon(resources.favicon);
     setTheme(resources.theme);
 
