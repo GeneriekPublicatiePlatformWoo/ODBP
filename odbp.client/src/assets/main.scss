@@ -1,4 +1,6 @@
-@layer base, layout, main; // main layer for import of tokens from external source
+// Add project css to layers to be sure that the imported external tokens
+// take highest precedence as they are loaded as unlayered css
+@layer base, layout;
 @import url("./design-tokens.scss") layer(base);
 @import url("@utrecht/component-library-css") layer(base);
 

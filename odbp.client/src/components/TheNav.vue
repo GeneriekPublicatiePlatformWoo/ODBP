@@ -33,8 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import type { Resources } from "@/resources";
+import { injectResources } from "@/resources";
 
-const resources = inject<Resources>("resources");
+const resources = injectResources();
 </script>

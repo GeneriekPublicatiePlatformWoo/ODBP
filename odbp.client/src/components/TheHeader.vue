@@ -13,9 +13,8 @@
 </template>
 
 <script lang="ts" setup>
-import { inject } from "vue";
 import TheNav from "./TheNav.vue";
-import type { Resources } from "@/resources";
+import { injectResources } from "@/resources";
 
-const resources = inject<Resources>("resources");
+const resources = injectResources();
 </script>
