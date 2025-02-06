@@ -53,7 +53,9 @@ const loadResources = async (sources: (string | undefined)[]) => {
 
   const results = await Promise.allSettled(promises);
 
-  const rejected = results.filter((result) => result.status === "rejected");
+  const rejected = results.filter(
+    (result): result is PromiseRejectedResult => result.status === "rejected"
+  );
 
   if (rejected.length) throw new Error(rejected.map((r) => r.reason.href).join(", "));
 };
