@@ -4,11 +4,14 @@
   @include mixin.utrecht-theme;
 
   --utrecht-space-around: 1;
+
   --utrecht-page-header-padding-block-start: 2px;
   --utrecht-page-header-padding-block-end: 2px;
   --utrecht-page-header-background-color: var(--utrecht-color-white);
   --utrecht-nav-bar-background-color: transparent;
+
   --utrecht-unordered-list-marker-color: var(--utrecht-color-blue-35);
+  
   --utrecht-page-footer-background-color: var(--utrecht-color-blue-35);
   --utrecht-page-footer-background-image: none;
 
