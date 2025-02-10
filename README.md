@@ -16,6 +16,16 @@
 | `DOWNLOAD_TIMEOUT_MINUTES`             | Het aantal minuten dat het downloaden van bestanden maximaal mag duren. <br/> (default waarde is `10`)                                                                                                                                                           |
 | `SITEMAP_CACHE_DURATION_HOURS`         | Het aantal uur dat de sitemap in de cache bewaard wordt. <br/> (default waarde is `23`)                                                                                                                                                                          |
 
+## Cross-Origin Resource Sharing (CORS) en COEP
+
+Deze applicatie maakt gebruik van Cross-Origin-Embedder-Policy (COEP: require-corp), wat betekent dat externe resources zoals afbeeldingen en stylesheets correct geladen moeten worden met crossorigin-attributen. Zorg ervoor dat alle externe resources de juiste Access-Control-Allow-Origin-header bevatten.
+
+### Bijvoorbeeld:
+
+`Access-Control-Allow-Origin: *` of `Access-Control-Allow-Origin: *.mijn-gemeente.nl`
+
+Als een resource niet correct is geconfigureerd, zal deze niet geladen worden door de browser.
+
 ## NLDS – NL Design System
 
 De interface van het Burgerportaal is opgebouwd met componenten uit het **NL Design System (NLDS)**. Dit is een verzameling ontwerp- en ontwikkelrichtlijnen voor digitale overheidsdiensten in Nederland. Door gebruik te maken van NLDS-componenten blijft de gebruikerservaring consistent en toegankelijk, in lijn met de standaarden van de overheid.
