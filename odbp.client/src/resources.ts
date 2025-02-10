@@ -10,7 +10,7 @@ export type Resources = Partial<{
   theme: string;
 }>;
 
-export const injectResources = () => inject<Resources>("resources");
+export const injectResources = () => inject<Resources | null>("resources", null);
 
 const getResources = async (): Promise<Resources> => {
   try {
@@ -43,6 +43,7 @@ const loadResources = async (sources: (string | undefined)[]) => {
       link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
       link.rel === "preload" && (link.as = "image");
       link.href = href;
+      link.crossOrigin = "anonymous";
 
       link.onload = () => resolve({ href });
       link.onerror = () => reject({ href });

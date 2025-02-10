@@ -28,10 +28,7 @@ namespace Microsoft.AspNetCore.Builder
                 })
                 .AddCrossOriginEmbedderPolicy(x =>
                 {
-                    // For now we allow the document to load cross-origin resources without giving explicit permission through the CORS protocol.
-                    // In a next iteration maybe make this policy setting (and corresponding crossorigin atrributes) configurable.
-                    // x.RequireCorp();
-                    x.UnsafeNone();
+                    x.RequireCorp();
                 })
                 .AddCrossOriginResourcePolicy(x =>
                 {

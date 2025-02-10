@@ -6,6 +6,7 @@
         :src="resources.image"
         class="gpp-woo-hero-image"
         alt="Afbeelding gemeente"
+        crossorigin="anonymous"
       />
 
       <div class="gpp-woo-card">
