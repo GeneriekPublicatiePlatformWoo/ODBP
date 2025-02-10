@@ -18,9 +18,18 @@ const router = createRouter({
       name: "zoeken",
       component: SearchView,
       meta: {
-        title: "Zoeken naar documenten"
+        title: "Zoeken"
       }
-    }
+    },
+    {
+      path: "/publicaties/:uuid",
+      name: "publicatie",
+      component: () => import("../views/PublicatieView.vue"),
+      props: true,
+      meta: {
+        title: "Publicatie"
+      }
+    },
   ]
 });
 

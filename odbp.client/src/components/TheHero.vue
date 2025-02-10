@@ -18,7 +18,10 @@
 
           <utrecht-paragraph>
             <router-link
-              :to="{ name: 'home' }"
+              :to="{
+                name: 'publicatie',
+                params: { uuid: 'a3e0aedb-952c-4721-af87-45422f33ff35' }
+              }"
               class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
               >Zoeken</router-link
             >
