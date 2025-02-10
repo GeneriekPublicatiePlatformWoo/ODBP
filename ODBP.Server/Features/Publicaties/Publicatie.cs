@@ -11,6 +11,7 @@
         public Eigenaar? Eigenaar { get; set; }
         public string? Publicatiestatus { get; set; }
         public DateTime Registratiedatum { get; set; }
+        public DateTime LaatstGewijzigdDatum { get; set; }
         public List<string>? InformatieCategorieen { get; set; }
     }
 

@@ -1,7 +1,11 @@
 <template>
-  <p class="notice" aria-live="polite" role="alert">
-    <slot></slot>
-  </p>
+  <div class="utrecht-alert utrecht-alert--error">
+    <div class="utrecht-alert__content">
+      <div class="utrecht-alert__message" role="alert">
+        <slot></slot>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts"></script>

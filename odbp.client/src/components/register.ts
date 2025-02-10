@@ -3,6 +3,7 @@ import type { App } from "vue";
 import {
   PageHeader as UtrechtPageHeader,
   PageFooter as UtrechtPageFooter,
+  Link as UtrechtLink,
   SkipLink as UtrechtSkipLink,
   Article as UtrechtArticle,
   Heading as UtrechtHeading,
@@ -26,6 +27,7 @@ import {
 const components = {
   UtrechtPageHeader,
   UtrechtPageFooter,
+  UtrechtLink,
   UtrechtSkipLink,
   UtrechtArticle,
   UtrechtHeading,

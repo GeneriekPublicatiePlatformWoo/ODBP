@@ -14,6 +14,7 @@ export type Publicatie = {
   eigenaar?: Eigenaar;
   publicatiestatus: keyof typeof PublicatieStatus;
   registratiedatum?: string;
+  laatstGewijzigdDatum?: string;
   informatieCategorieen: string[];
 };
 
@@ -26,6 +27,8 @@ export type PublicatieDocument = {
   omschrijving?: string;
   publicatiestatus: keyof typeof PublicatieStatus;
   creatiedatum: string;
+  registratiedatum?: string;
+  laatstGewijzigdDatum?: string;
   bestandsnaam: string;
   bestandsformaat: string;
   bestandsomvang: number;
