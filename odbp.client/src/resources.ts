@@ -23,34 +23,45 @@ const getResources = async (): Promise<Resources> => {
 
 const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
 
-const setIcon = (href?: string) => {
+const loadAndEncodeIcon = async (href?: string) => {
   if (!href) return;
 
-  const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+  try {
+    const response = await fetch(href);
 
-  link.href = href;
-  link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
+    if (!response.ok) throw Error();
+
+    const blob = await response.blob();
+    const reader = new FileReader();
+
+    (document.querySelector("link[rel~='icon']") as HTMLLinkElement).href =
+      await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+  } catch {
+    return;
+  }
 };
 
-const validSources = (sources: (string | undefined)[]) =>
-  sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
-
 const loadResources = async (sources: (string | undefined)[]) => {
-  const promises = validSources(sources).map((href) => {
-    return new Promise<{ href: string }>((resolve, reject) => {
-      const link = document.createElement("link");
+  const promises = sources
+    .filter((url): url is string => typeof url === "string" && url.trim() !== "")
+    .map((href) => {
+      return new Promise<{ href: string }>((resolve, reject) => {
+        const link = document.createElement("link");
 
-      link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
-      link.rel === "preload" && (link.as = "image");
-      link.href = href;
-      link.crossOrigin = "anonymous";
+        link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
+        link.rel === "preload" && (link.as = "image");
+        link.href = href;
+        link.crossOrigin = "anonymous";
 
-      link.onload = () => resolve({ href });
-      link.onerror = () => reject({ href });
+        link.onload = () => resolve({ href });
+        link.onerror = () => reject({ href });
 
-      document.head.appendChild(link);
+        document.head.appendChild(link);
+      });
     });
-  });
 
   const results = await Promise.allSettled(promises);
 
@@ -72,8 +83,9 @@ export const loadThemeResources = async (app: App): Promise<void> => {
     // Images will be preloaded, waiting to be referenced from the app
     await loadResources([resources.tokens, resources.logo, resources.image]);
 
-    // Replace the provided favicon link
-    setIcon(resources.favicon);
+    // Not all browsers enforce a cors request for link rel=icon with crossorigin attribute
+    // so the icon is fetched by js and added as a base64 encoded string to href attribute
+    await loadAndEncodeIcon(resources.favicon);
 
     // Apply the associated theme class to the root element of the app
     setTheme(resources.theme);

@@ -18,7 +18,7 @@
 
 ## Cross-Origin Resource Sharing (CORS) en COEP
 
-Deze applicatie maakt gebruik van Cross-Origin-Embedder-Policy (COEP: require-corp), wat betekent dat externe resources zoals afbeeldingen en stylesheets correct geladen moeten worden met crossorigin-attributen. Zorg ervoor dat alle externe resources de juiste Access-Control-Allow-Origin-header bevatten.
+Deze applicatie maakt gebruik van Cross-Origin-Embedder-Policy (COEP: require-corp) en externe resources zoals afbeeldingen en stylesheets worden geladen met crossorigin-attributen. Dat betekent dat alle externe resources de juiste Access-Control-Allow-Origin-header moeten bevatten.
 
 ### Bijvoorbeeld:
 
