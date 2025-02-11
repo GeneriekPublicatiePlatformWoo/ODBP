@@ -26,9 +26,27 @@
     </utrecht-paragraph>
 
     <utrecht-unordered-list>
-      <utrecht-unordered-list-item>List item 1</utrecht-unordered-list-item>
-      <utrecht-unordered-list-item>List item 2</utrecht-unordered-list-item>
-      <utrecht-unordered-list-item>List item 3</utrecht-unordered-list-item>
+      <utrecht-unordered-list-item>
+        <router-link
+          :to="{
+            name: 'publicatie',
+            params: { uuid: 'a3e0aedb-952c-4721-af87-45422f33ff35' }
+          }"
+          class="utrecht-link utrecht-link--html-a"
+          >Nieuwste publicatie</router-link
+        >
+      </utrecht-unordered-list-item>
+
+      <utrecht-unordered-list-item>
+        <router-link
+          :to="{
+            name: 'publicatie',
+            params: { uuid: 'a425f67b-2bd3-40bf-bb4b-a54a64f5d0ef' }
+          }"
+          class="utrecht-link utrecht-link--html-a"
+          >Nieuwe publicatie met 7 bestanden</router-link
+        >
+      </utrecht-unordered-list-item>
     </utrecht-unordered-list>
   </utrecht-article>
 </template>

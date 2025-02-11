@@ -31,14 +31,14 @@
         </utrecht-table-body>
       </utrecht-table>
 
-      <utrecht-table>
+      <utrecht-table class="utrecht-table--alternate-row-color">
         <utrecht-table-caption>Documenten bij deze publicatie</utrecht-table-caption>
 
         <utrecht-table-header>
           <utrecht-table-row>
             <utrecht-table-header-cell scope="col">Officiële titel</utrecht-table-header-cell>
             <utrecht-table-header-cell scope="col">Laatst gewijzigd op</utrecht-table-header-cell>
-            <utrecht-table-header-cell scope="col"></utrecht-table-header-cell>
+            <utrecht-table-header-cell scope="col">Download</utrecht-table-header-cell>
           </utrecht-table-row>
         </utrecht-table-header>
 
@@ -53,7 +53,7 @@
               <utrecht-link
                 :href="`${API_URL}/documenten/${uuid}/download`"
                 :download="bestandsnaam"
-                >Download</utrecht-link
+                >{{ bestandsnaam }}</utrecht-link
               >
             </utrecht-table-cell>
           </utrecht-table-row>
@@ -123,6 +123,6 @@ const {
 
 <style lang="scss" scoped>
 section {
-  --utrecht-space-around: 2;
+  --utrecht-space-around: 4;
 }
 </style>
