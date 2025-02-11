@@ -66,10 +66,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useFetchApi } from "@/api/use-fetch-api";
+import { useAllPages } from "@/composables/use-all-pages";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import AlertInline from "@/components/AlertInline.vue";
 import type { Publicatie, PublicatieDocument } from "./types";
-import { useAllPages } from "@/composables/use-all-pages";
+import { waardelijsten } from "@/stores/waardelijsten";
 
 const API_URL = `/api/v1`;
 
@@ -90,8 +91,21 @@ const {
 const publicatie = computed<Map<string, string | undefined>>(
   () =>
     new Map([
-      ["Informatiecategorieën", publicatieData.value?.informatieCategorieen.join(", ")],
-      ["Organisatie", publicatieData.value?.publisher],
+      [
+        "Informatiecategorieën",
+        publicatieData.value?.informatieCategorieen
+          .map(
+            (uuid) =>
+              waardelijsten.value.informatiecategorieen.find((c) => c.uuid === uuid)?.naam ||
+              "onbekend"
+          )
+          .join(", ")
+      ],
+      [
+        "Organisatie",
+        waardelijsten.value.organisaties.find((o) => o.uuid === publicatieData.value?.publisher)
+          ?.naam || "onbekend"
+      ],
       ["Officiële titel", publicatieData.value?.officieleTitel],
       ["Verkorte titel", publicatieData.value?.verkorteTitel],
       ["Omschrijving", publicatieData.value?.omschrijving],
@@ -109,6 +123,6 @@ const {
 
 <style lang="scss" scoped>
 section {
-  --utrecht-space-around: 4;
+  --utrecht-space-around: 2;
 }
 </style>
