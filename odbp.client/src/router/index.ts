@@ -30,6 +30,15 @@ const router = createRouter({
         title: "Publicatie"
       }
     },
+    {
+      path: "/documenten/:uuid",
+      name: "document",
+      component: () => import("../views/DocumentView.vue"),
+      props: true,
+      meta: {
+        title: "Document"
+      }
+    }
   ]
 });
 

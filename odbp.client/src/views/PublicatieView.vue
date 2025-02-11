@@ -7,5 +7,3 @@ import PublicatieDetails from "@/features/publicatie/PublicatieDetails.vue";
 
 defineProps<{ uuid: string }>();
 </script>
-
-<style lang="scss" scoped></style>
