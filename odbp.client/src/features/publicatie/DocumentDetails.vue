@@ -32,6 +32,7 @@
       <utrecht-paragraph>
         <a
           :href="`${API_URL}/documenten/${uuid}/download`"
+          :download="documentData?.bestandsnaam"
           class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
         >
           <gpp-woo-icon icon="download" />
@@ -56,7 +57,13 @@
         <utrecht-table-body>
           <utrecht-table-row>
             <utrecht-table-header-cell scope="row">Officiële titel</utrecht-table-header-cell>
-            <utrecht-table-cell>{{ publicatieData?.officieleTitel }}</utrecht-table-cell>
+            <utrecht-table-cell>
+              <router-link
+                :to="{ name: 'publicatie', params: { uuid: publicatieData?.uuid } }"
+                class="utrecht-link utrecht-link--html-a"
+                >{{ publicatieData?.officieleTitel }}</router-link
+              >
+            </utrecht-table-cell>
           </utrecht-table-row>
 
           <utrecht-table-row>
@@ -128,9 +135,7 @@ const documentRows = computed<Map<string, string | undefined>>(
 );
 
 const fileSizeKb = computed(() =>
-  documentData.value?.bestandsomvang
-    ? Math.floor(documentData.value.bestandsomvang / 1024)
-    : null
+  documentData.value?.bestandsomvang ? Math.floor(documentData.value.bestandsomvang / 1024) : null
 );
 </script>
 

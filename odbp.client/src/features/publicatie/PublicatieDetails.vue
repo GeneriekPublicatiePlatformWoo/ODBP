@@ -38,23 +38,43 @@
           <utrecht-table-row>
             <utrecht-table-header-cell scope="col">Officiële titel</utrecht-table-header-cell>
             <utrecht-table-header-cell scope="col">Laatst gewijzigd op</utrecht-table-header-cell>
-            <utrecht-table-header-cell scope="col">Download</utrecht-table-header-cell>
+            <utrecht-table-header-cell scope="col">
+              <span class="visually-hidden">Download</span>
+            </utrecht-table-header-cell>
           </utrecht-table-row>
         </utrecht-table-header>
 
         <utrecht-table-body>
           <utrecht-table-row
-            v-for="{ uuid, officieleTitel, laatstGewijzigdDatum, bestandsnaam } in documenten"
+            v-for="{
+              uuid,
+              officieleTitel,
+              laatstGewijzigdDatum,
+              bestandsnaam,
+              bestandsomvang
+            } in documenten"
             :key="uuid"
           >
-            <utrecht-table-cell>{{ officieleTitel }}</utrecht-table-cell>
+            <utrecht-table-cell>
+              <router-link
+                :to="{ name: 'document', params: { uuid } }"
+                class="utrecht-link utrecht-link--html-a"
+                >{{ officieleTitel }}</router-link
+              >
+            </utrecht-table-cell>
             <utrecht-table-cell>{{ formatDate(laatstGewijzigdDatum) }}</utrecht-table-cell>
             <utrecht-table-cell>
               <utrecht-link
                 :href="`${API_URL}/documenten/${uuid}/download`"
                 :download="bestandsnaam"
-                >{{ bestandsnaam }}</utrecht-link
               >
+                <gpp-woo-icon icon="download" />
+
+                Download ({{ bestandsnaam.split(".").pop()
+                }}{{
+                  bestandsomvang ? `, ${Math.floor(bestandsomvang / 1024)}kb` : null
+                }})
+              </utrecht-link>
             </utrecht-table-cell>
           </utrecht-table-row>
         </utrecht-table-body>
@@ -69,6 +89,7 @@ import { useFetchApi } from "@/api/use-fetch-api";
 import { useAllPages } from "@/composables/use-all-pages";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import AlertInline from "@/components/AlertInline.vue";
+import GppWooIcon from "@/components/GppWooIcon.vue";
 import { formatDate } from "@/helpers";
 import type { Publicatie, PublicatieDocument } from "./types";
 import { waardelijsten } from "@/stores/waardelijsten";
@@ -124,5 +145,13 @@ const publicatieRows = computed<Map<string, string | undefined>>(
 <style lang="scss" scoped>
 th[scope="row"] {
   inline-size: 20ch;
+}
+
+td {
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--utrecht-button-icon-gap);
+  }
 }
 </style>
