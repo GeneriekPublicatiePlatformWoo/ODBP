@@ -18,7 +18,7 @@
 
           <utrecht-paragraph>
             <router-link
-              :to="{ name: 'home' }"
+              :to="{ name: 'zoeken' }"
               class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
               >Zoeken</router-link
             >

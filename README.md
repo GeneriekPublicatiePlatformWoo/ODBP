@@ -16,13 +16,17 @@
 | `DOWNLOAD_TIMEOUT_MINUTES`             | Het aantal minuten dat het downloaden van bestanden maximaal mag duren. <br/> (default waarde is `10`)                                                                                                                                                           |
 | `SITEMAP_CACHE_DURATION_HOURS`         | Het aantal uur dat de sitemap in de cache bewaard wordt. <br/> (default waarde is `23`)                                                                                                                                                                          |
 
-## Cross-Origin Resource Sharing (CORS) en COEP
+## Cross-Origin Resource Sharing (CORS) en Cross-Origin-Embedder-Policy (COEP)
 
-Deze applicatie maakt gebruik van Cross-Origin-Embedder-Policy (COEP: require-corp), wat betekent dat externe resources zoals afbeeldingen en stylesheets correct geladen moeten worden met crossorigin-attributen. Zorg ervoor dat alle externe resources de juiste Access-Control-Allow-Origin-header bevatten.
+Deze applicatie maakt gebruik van Cross-Origin-Embedder-Policy (COEP: require-corp), maar de externe resources (afbeeldingen en stylesheets) worden geladen onder CORS (met cross-origin-attributen). Dat betekent dat die externe resources de juiste Access-Control-Allow-Origin-header moeten bevatten.
 
-### Bijvoorbeeld:
+Alleen moet vanwege COEP voor het favicon ook de Cross-Origin-Resource-Policy-header gezet worden, omdat sommige browsers bij `<link rel=icon crossorigin>` het cross-origin-attribuut negeren en de resource geladen wordt in zogenaamde `no-cors` mode.
 
-`Access-Control-Allow-Origin: *` of `Access-Control-Allow-Origin: *.mijn-gemeente.nl`
+### Headers:
+
+Voor alle externe resources moet `Access-Control-Allow-Origin: *` of bijvoorbeeld `Access-Control-Allow-Origin: *.mijn-gemeente.nl` ingesteld worden.
+
+En voor het favicon naast de CORS-header ook CORP-header `Cross-Origin-Resource-Policy: cross-origin` instellen.
 
 Als een resource niet correct is geconfigureerd, zal deze niet geladen worden door de browser.
 

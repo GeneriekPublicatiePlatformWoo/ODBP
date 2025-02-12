@@ -23,34 +23,27 @@ const getResources = async (): Promise<Resources> => {
 
 const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
 
-const setIcon = (href?: string) => {
-  if (!href) return;
-
-  const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-
-  link.href = href;
-  link.type = href.endsWith(".svg") ? "image/svg+xml" : "image/x-icon";
-};
-
-const validSources = (sources: (string | undefined)[]) =>
-  sources.filter((url): url is string => typeof url === "string" && url.trim() !== "");
+const setIcon = (href?: string) =>
+  href && ((document.querySelector("link[rel~='icon']") as HTMLLinkElement).href = href);
 
 const loadResources = async (sources: (string | undefined)[]) => {
-  const promises = validSources(sources).map((href) => {
-    return new Promise<{ href: string }>((resolve, reject) => {
-      const link = document.createElement("link");
+  const promises = sources
+    .filter((url): url is string => typeof url === "string" && url.trim() !== "")
+    .map((href) => {
+      return new Promise<{ href: string }>((resolve, reject) => {
+        const link = document.createElement("link");
 
-      link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
-      link.rel === "preload" && (link.as = "image");
-      link.href = href;
-      link.crossOrigin = "anonymous";
+        link.rel = href.endsWith(".css") ? "stylesheet" : "preload";
+        link.rel === "preload" && (link.as = "image");
+        link.href = href;
+        link.crossOrigin = "anonymous";
 
-      link.onload = () => resolve({ href });
-      link.onerror = () => reject({ href });
+        link.onload = () => resolve({ href });
+        link.onerror = () => reject({ href });
 
-      document.head.appendChild(link);
+        document.head.appendChild(link);
+      });
     });
-  });
 
   const results = await Promise.allSettled(promises);
 
