@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.17.1" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>8.0.12</Version>
     </PackageReference>
