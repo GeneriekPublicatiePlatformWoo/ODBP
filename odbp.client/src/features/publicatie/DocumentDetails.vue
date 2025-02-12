@@ -41,6 +41,31 @@
           }})</a
         >
       </utrecht-paragraph>
+
+      <utrecht-table>
+        <utrecht-table-caption>Gekoppelde publicatie</utrecht-table-caption>
+
+        <utrecht-table-header class="utrecht-table__header--hidden">
+          <utrecht-table-row>
+            <utrecht-table-header-cell scope="col">Publicatiekenmerk</utrecht-table-header-cell>
+            <utrecht-table-header-cell scope="col"
+              >Publicatiekenmerkwaarde</utrecht-table-header-cell
+            >
+          </utrecht-table-row>
+        </utrecht-table-header>
+
+        <utrecht-table-body>
+          <utrecht-table-row>
+            <utrecht-table-header-cell scope="row">Officiële titel</utrecht-table-header-cell>
+            <utrecht-table-cell>{{ publicatieData?.officieleTitel }}</utrecht-table-cell>
+          </utrecht-table-row>
+
+          <utrecht-table-row>
+            <utrecht-table-header-cell scope="row">Laatst gewijzigd op</utrecht-table-header-cell>
+            <utrecht-table-cell>{{ formatDate(publicatieData?.laatstGewijzigdDatum) }}</utrecht-table-cell>
+          </utrecht-table-row>
+        </utrecht-table-body>
+      </utrecht-table>
     </section>
   </template>
 </template>
@@ -100,6 +125,6 @@ const document = computed<Map<string, string | undefined>>(
 
 <style lang="scss" scoped>
 section {
-  --utrecht-space-around: 4;
+  --utrecht-space-around: 2;
 }
 </style>

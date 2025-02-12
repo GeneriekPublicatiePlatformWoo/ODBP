@@ -47,6 +47,17 @@
           >Nieuwe publicatie met 7 bestanden</router-link
         >
       </utrecht-unordered-list-item>
+
+      <utrecht-unordered-list-item>
+        <router-link
+          :to="{
+            name: 'document',
+            params: { uuid: 'feab8d31-e8e2-43ec-b893-3ece191b1569' }
+          }"
+          class="utrecht-link utrecht-link--html-a"
+          >Document Common Ground (14)</router-link
+        >
+      </utrecht-unordered-list-item>
     </utrecht-unordered-list>
   </utrecht-article>
 </template>
