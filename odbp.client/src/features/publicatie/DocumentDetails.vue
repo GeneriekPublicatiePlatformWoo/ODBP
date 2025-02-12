@@ -20,7 +20,7 @@
         </utrecht-table-header>
 
         <utrecht-table-body>
-          <utrecht-table-row v-for="[key, value] in document" :key="key">
+          <utrecht-table-row v-for="[key, value] in documentRows" :key="key">
             <template v-if="value?.length">
               <utrecht-table-header-cell scope="row">{{ key }}</utrecht-table-header-cell>
               <utrecht-table-cell>{{ value }}</utrecht-table-cell>
@@ -34,7 +34,7 @@
           :href="`${API_URL}/documenten/${uuid}/download`"
           class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
         >
-          <the-icon icon="download" />
+          <gpp-woo-icon icon="download" />
 
           Download ({{ documentData?.bestandsnaam.split(".").pop()
           }}{{ fileSizeKb ? `, ${fileSizeKb}kb` : "" }})
@@ -76,7 +76,7 @@ import { computed, useId, watch } from "vue";
 import { useFetchApi } from "@/api/use-fetch-api";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import AlertInline from "@/components/AlertInline.vue";
-import TheIcon from "@/components/TheIcon.vue";
+import GppWooIcon from "@/components/GppWooIcon.vue";
 import { formatDate } from "@/helpers";
 import type { Publicatie, PublicatieDocument } from "./types";
 import { waardelijsten } from "@/stores/waardelijsten";
@@ -110,7 +110,7 @@ watch(
   async (publicatie) => publicatie && (await getPublicatie().execute())
 );
 
-const document = computed<Map<string, string | undefined>>(
+const documentRows = computed<Map<string, string | undefined>>(
   () =>
     new Map([
       ["Identificatie", documentData.value?.identifier],
@@ -129,7 +129,7 @@ const document = computed<Map<string, string | undefined>>(
 
 const fileSizeKb = computed(() =>
   documentData.value?.bestandsomvang
-    ? Math.floor(documentData.value.bestandsomvang / Math.pow(1024, 1))
+    ? Math.floor(documentData.value.bestandsomvang / 1024)
     : null
 );
 </script>
