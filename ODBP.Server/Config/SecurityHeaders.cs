@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.Builder
 
             var imgSources = new List<string?> {
                 "'self'",
-                resourcesConfig.Logo,
                 resourcesConfig.Favicon,
+                resourcesConfig.Logo,
                 resourcesConfig.Image
             };
 
