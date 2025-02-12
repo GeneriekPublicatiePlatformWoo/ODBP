@@ -23,26 +23,8 @@ const getResources = async (): Promise<Resources> => {
 
 const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
 
-const loadAndEncodeIcon = async (href?: string) => {
-  if (!href) return;
-
-  try {
-    const response = await fetch(href);
-
-    if (!response.ok) throw Error();
-
-    const blob = await response.blob();
-    const reader = new FileReader();
-
-    (document.querySelector("link[rel~='icon']") as HTMLLinkElement).href =
-      await new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
-      });
-  } catch {
-    return;
-  }
-};
+const setIcon = (href?: string) =>
+  href && ((document.querySelector("link[rel~='icon']") as HTMLLinkElement).href = href);
 
 const loadResources = async (sources: (string | undefined)[]) => {
   const promises = sources
@@ -83,9 +65,8 @@ export const loadThemeResources = async (app: App): Promise<void> => {
     // Images will be preloaded, waiting to be referenced from the app
     await loadResources([resources.tokens, resources.logo, resources.image]);
 
-    // Not all browsers enforce a cors request for link rel=icon with crossorigin attribute
-    // so the icon is fetched by js and added as a base64 encoded string to href attribute
-    await loadAndEncodeIcon(resources.favicon);
+    // Replace the provided favicon link
+    setIcon(resources.favicon);
 
     // Apply the associated theme class to the root element of the app
     setTheme(resources.theme);
