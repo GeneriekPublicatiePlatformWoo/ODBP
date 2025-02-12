@@ -31,9 +31,9 @@
         </utrecht-table-body>
       </utrecht-table>
 
-      <utrecht-table class="utrecht-table--alternate-row-color">
-        <utrecht-table-caption>Documenten bij deze publicatie</utrecht-table-caption>
+      <utrecht-heading :level="2" :id="headingId">Documenten bij deze publicatie</utrecht-heading>
 
+      <utrecht-table :aria-labelledby="headingId" class="utrecht-table--alternate-row-color">
         <utrecht-table-header>
           <utrecht-table-row>
             <utrecht-table-header-cell scope="col">Officiële titel</utrecht-table-header-cell>
@@ -64,11 +64,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useId } from "vue";
 import { useFetchApi } from "@/api/use-fetch-api";
 import { useAllPages } from "@/composables/use-all-pages";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import AlertInline from "@/components/AlertInline.vue";
+import { formatDate } from "@/helpers";
 import type { Publicatie, PublicatieDocument } from "./types";
 import { waardelijsten } from "@/stores/waardelijsten";
 
@@ -76,8 +77,7 @@ const API_URL = `/api/v1`;
 
 const props = defineProps<{ uuid: string }>();
 
-const formatDate = (date?: string) =>
-  date && Intl.DateTimeFormat("default", { dateStyle: "long" }).format(Date.parse(date));
+const headingId = useId();
 
 const loading = computed(() => loadingPublicatie.value || loadingDocumenten.value);
 const error = computed(() => !!publicatieError.value || !!documentenError.value);
@@ -87,6 +87,12 @@ const {
   isFetching: loadingPublicatie,
   error: publicatieError
 } = useFetchApi(() => `${API_URL}/publicaties/${props.uuid}`).json<Publicatie>();
+
+const {
+  data: documenten,
+  loading: loadingDocumenten,
+  error: documentenError
+} = useAllPages<PublicatieDocument>(`${API_URL}/documenten/?publicatie=${props.uuid}`);
 
 const publicatie = computed<Map<string, string | undefined>>(
   () =>
@@ -113,16 +119,10 @@ const publicatie = computed<Map<string, string | undefined>>(
       ["Laatst gewijzigd op", formatDate(publicatieData.value?.laatstGewijzigdDatum)]
     ])
 );
-
-const {
-  data: documenten,
-  loading: loadingDocumenten,
-  error: documentenError
-} = useAllPages<PublicatieDocument>(`${API_URL}/documenten/?publicatie=${props.uuid}`);
 </script>
 
 <style lang="scss" scoped>
-section {
-  --utrecht-space-around: 4;
+th[scope="row"] {
+  inline-size: 20ch;
 }
 </style>

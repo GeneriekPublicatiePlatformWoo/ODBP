@@ -33,18 +33,17 @@
         <a
           :href="`${API_URL}/documenten/${uuid}/download`"
           class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
-          >Download ({{ documentData?.bestandsnaam.split(".").pop()
-          }}{{
-            documentData?.bestandsomvang
-              ? `, ${Math.floor(documentData.bestandsomvang / Math.pow(1024, 1))}kb`
-              : ""
-          }})</a
         >
+          <the-icon icon="download" />
+
+          Download ({{ documentData?.bestandsnaam.split(".").pop()
+          }}{{ fileSizeKb ? `, ${fileSizeKb}kb` : "" }})
+        </a>
       </utrecht-paragraph>
 
-      <utrecht-table>
-        <utrecht-table-caption>Gekoppelde publicatie</utrecht-table-caption>
+      <utrecht-heading :level="2" :id="headingId">Gekoppelde publicatie</utrecht-heading>
 
+      <utrecht-table :aria-labelledby="headingId">
         <utrecht-table-header class="utrecht-table__header--hidden">
           <utrecht-table-row>
             <utrecht-table-header-cell scope="col">Publicatiekenmerk</utrecht-table-header-cell>
@@ -62,7 +61,9 @@
 
           <utrecht-table-row>
             <utrecht-table-header-cell scope="row">Laatst gewijzigd op</utrecht-table-header-cell>
-            <utrecht-table-cell>{{ formatDate(publicatieData?.laatstGewijzigdDatum) }}</utrecht-table-cell>
+            <utrecht-table-cell>{{
+              formatDate(publicatieData?.laatstGewijzigdDatum)
+            }}</utrecht-table-cell>
           </utrecht-table-row>
         </utrecht-table-body>
       </utrecht-table>
@@ -71,10 +72,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, useId, watch } from "vue";
 import { useFetchApi } from "@/api/use-fetch-api";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import AlertInline from "@/components/AlertInline.vue";
+import TheIcon from "@/components/TheIcon.vue";
+import { formatDate } from "@/helpers";
 import type { Publicatie, PublicatieDocument } from "./types";
 import { waardelijsten } from "@/stores/waardelijsten";
 
@@ -82,8 +85,7 @@ const API_URL = `/api/v1`;
 
 const props = defineProps<{ uuid: string }>();
 
-const formatDate = (date?: string) =>
-  date && Intl.DateTimeFormat("default", { dateStyle: "long" }).format(Date.parse(date));
+const headingId = useId();
 
 const loading = computed(() => loadingDocument.value || loadingPublicatie.value);
 const error = computed(() => !!documentError.value || !!publicatieError.value);
@@ -103,7 +105,10 @@ const {
   immediate: false
 }).json<Publicatie>();
 
-watch(documentData, async () => await getPublicatie().execute());
+watch(
+  () => documentData.value?.publicatie,
+  async (publicatie) => publicatie && (await getPublicatie().execute())
+);
 
 const document = computed<Map<string, string | undefined>>(
   () =>
@@ -121,10 +126,16 @@ const document = computed<Map<string, string | undefined>>(
       ["Laatst gewijzigd op", formatDate(documentData.value?.laatstGewijzigdDatum)]
     ])
 );
+
+const fileSizeKb = computed(() =>
+  documentData.value?.bestandsomvang
+    ? Math.floor(documentData.value.bestandsomvang / Math.pow(1024, 1))
+    : null
+);
 </script>
 
 <style lang="scss" scoped>
-section {
-  --utrecht-space-around: 2;
+th[scope="row"] {
+  inline-size: 20ch;
 }
 </style>

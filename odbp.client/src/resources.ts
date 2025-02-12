@@ -21,7 +21,7 @@ const getResources = async (): Promise<Resources> => {
   }
 };
 
-const setTheme = (theme?: string) => theme && document.querySelector("#app")?.classList.add(theme);
+const setTheme = (theme?: string) => theme && document.body.classList.add(theme);
 
 const setIcon = (href?: string) =>
   href && ((document.querySelector("link[rel~='icon']") as HTMLLinkElement).href = href);
