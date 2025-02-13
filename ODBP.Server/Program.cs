@@ -65,8 +65,11 @@ try
     app.MapHealthChecks("/healthz");
     app.MapFallbackToIndexHtml();
 
-
-    await SearchClientMock.Seed(app);
+    if (app.Environment.IsDevelopment())
+    {
+        await SearchClientMock.Seed(app);
+    }
+    
     app.Run();
 }
 catch (Exception ex) when (ex is not HostAbortedException)

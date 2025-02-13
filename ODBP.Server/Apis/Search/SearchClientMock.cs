@@ -1,11 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Elastic.Transport;
 using Microsoft.AspNetCore.WebUtilities;
-using ODBP.Apis.Odrc;
-using ODBP.Features.Sitemap.SitemapInstances;
 
 namespace ODBP.Apis.Search;
 
@@ -201,99 +200,46 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
     #region Seed
     public static async Task Seed(WebApplication app)
     {
-        CancellationToken token = default;
+
         var elasticsearch = app.Services.GetRequiredService<ElasticsearchClient>();
-        using var odrcClient = app.Services.GetRequiredService<IOdrcClientFactory>().Create("Seed elasticsearch mock");
-        var organisatiesTask = SitemapController.GetWaardelijstDictionary(odrcClient, OrganisatiesPath, token);
-        var informatiecategorieenTask = SitemapController.GetWaardelijstDictionary(odrcClient, InformatieCategorieenPath, token);
+        var headResponse = await elasticsearch.Transport.HeadAsync("/" + IndexName);
 
-        var gepubliceerdePublicaties = await SitemapController.GetGepubliceerdePublicatieDictionary(odrcClient, token);
-        var organisaties = await organisatiesTask;
-        var informatiecategorieen = await informatiecategorieenTask;
-        var exists = (await elasticsearch.Transport.HeadAsync("/" + IndexName));
-
-        if (exists.ApiCallDetails.HttpStatusCode == 404)
+        if (headResponse.ApiCallDetails.HttpStatusCode != 404)
         {
-            var z = await elasticsearch.Indices.CreateAsync<SearchResult>(IndexName, i => i.Mappings(m => m.Properties(p => p
-            .Keyword(p => p.ResultType)
-            .Nested(p => p.InformatieCategorieen, zz => zz.Properties(xx => xx.Keyword(yy => yy.InformatieCategorieen[0].Uuid).Keyword(yy => yy.InformatieCategorieen[0].Name)))
-            .Nested(p => p.Publisher, zz => zz.Properties(xx => xx.Keyword(yy => yy.Publisher.Uuid).Keyword(yy => yy.Publisher.Name)))
-            )), default);
+            return;
+        }
 
-            foreach (var publicatie in gepubliceerdePublicaties.Values)
-            {
-                var record = new SearchResult
-                {
-                    InformatieCategorieen = SitemapController.LookupValuesInDictionary(publicatie.InformatieCategorieen, informatiecategorieen).Select(x => new InformatieCategorie { Name = x.Value, Uuid = x.Resource }).ToArray(),
-                    LaatstGewijzigdDatum = publicatie.LaatstGewijzigdDatum,
-                    OfficieleTitel = publicatie.OfficieleTitel,
-                    VerkorteTitel = publicatie.VerkorteTitel,
-                    Omschrijving = publicatie.Omschrijving,
-                    Publisher = organisaties.TryGetValue(publicatie.Publisher, out var org) ? new Org { Name = org.Value, Uuid = org.Resource } : null,
-                    Registratiedatum = publicatie.Registratiedatum,
-                    ResultType = ResultType.Publication,
-                    Uuid = publicatie.Uuid,
-                };
-                await elasticsearch.IndexAsync(record, x => x.Index(IndexName));
-            }
+        try
+        {
+            await elasticsearch.Indices.CreateAsync<SearchResult>(IndexName, i => i.Mappings(m => m.Properties(p => p
+                .Keyword(p => p.ResultType)
+                .Nested(p => p.InformatieCategorieen, zz => zz.Properties(xx => xx.Keyword(yy => yy.InformatieCategorieen[0].Uuid).Keyword(yy => yy.InformatieCategorieen[0].Name)))
+                .Nested(p => p.Publisher, zz => zz.Properties(xx => xx.Keyword(yy => yy.Publisher.Uuid).Keyword(yy => yy.Publisher.Name)))
+                )), default);
 
-            await foreach (var item in GetAllPages(odrcClient, DocumentenQueryPath, token))
+            await foreach (var item in GetRecordsFromFile(default))
             {
-                var document = item.Deserialize(SitemapPublicatieContext.Default.OdrcDocument);
-                if (!gepubliceerdePublicaties.TryGetValue(document!.Publicatie, out var publicatie))
-                {
-                    continue;
-                }
-                var record = new SearchResult
-                {
-                    InformatieCategorieen = SitemapController.LookupValuesInDictionary(publicatie.InformatieCategorieen, informatiecategorieen).Select(x => new InformatieCategorie { Name = x.Value, Uuid = x.Resource }).ToArray(),
-                    LaatstGewijzigdDatum = document.LaatstGewijzigdDatum,
-                    OfficieleTitel = document.OfficieleTitel,
-                    VerkorteTitel = document.VerkorteTitel,
-                    Omschrijving = document.Omschrijving,
-                    Publisher = organisaties.TryGetValue(publicatie.Publisher, out var org) ? new Org { Name = org.Value, Uuid = org.Resource } : null,
-                    Registratiedatum = DateTimeOffset.Parse(document.Creatiedatum),
-                    ResultType = ResultType.Document,
-                    Uuid = document.Uuid,
-                };
-                await elasticsearch.IndexAsync(record, x => x.Index(IndexName));
+                await elasticsearch.IndexAsync(item, x => x.Index(IndexName));
             }
+        }
+        catch
+        {
         }
     }
 
-    /// <summary>
-    /// Doorloopt alle pagina's van een API-response en retourneert de resultaten.
-    /// </summary>
-    private static async IAsyncEnumerable<JsonElement> GetAllPages(HttpClient client, string url, [EnumeratorCancellation] CancellationToken token)
+    private static readonly JsonSerializerOptions s_serializerOptions = new(JsonSerializerDefaults.Web);
+
+    private static async IAsyncEnumerable<SearchResult> GetRecordsFromFile([EnumeratorCancellation] CancellationToken token)
     {
-        string? next = null;
-        using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token))
+        var assembly = Assembly.GetExecutingAssembly();
+        var qualifiedName = assembly.GetManifestResourceNames().FirstOrDefault(x => x.Contains("mock-content.json"));
+        if (string.IsNullOrWhiteSpace(qualifiedName)) yield break;
+        await using var stream = assembly.GetManifestResourceStream(qualifiedName)!;
+        await foreach (var item in JsonSerializer.DeserializeAsyncEnumerable<SearchResult>(stream, s_serializerOptions, cancellationToken: token).WithCancellation(token))
         {
-            response.EnsureSuccessStatusCode();
-            await using var stream = await response.Content.ReadAsStreamAsync(token);
-            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: token);
-            if (doc.RootElement.TryGetProperty("next", out var nextProp) && nextProp.ValueKind == JsonValueKind.String)
-            {
-                next = nextProp.GetString();
-            }
-            if (doc.RootElement.TryGetProperty("results", out var resultsProp) && resultsProp.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var item in resultsProp.EnumerateArray())
-                {
-                    yield return item;
-                }
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(next))
-        {
-            await foreach (var item in GetAllPages(client, next, token))
-            {
-                yield return item;
-            }
+            if (item != null) yield return item;
         }
     }
-
     #endregion
 
 }

@@ -109,7 +109,7 @@ namespace ODBP.Features.Sitemap.SitemapInstances
         /// <summary>
         /// Haalt een waardelijst op zodat we de waardes op basis van de id kunnen opzoeken.
         /// </summary>
-        internal static async Task<IReadOnlyDictionary<string, ResourceWithValue>> GetWaardelijstDictionary(HttpClient client, string path, CancellationToken token)
+        private static async Task<IReadOnlyDictionary<string, ResourceWithValue>> GetWaardelijstDictionary(HttpClient client, string path, CancellationToken token)
         {
             var result = new Dictionary<string, ResourceWithValue>();
             await foreach (var item in GetAllPages(client, path, token))
@@ -131,7 +131,7 @@ namespace ODBP.Features.Sitemap.SitemapInstances
         /// <summary>
         /// Haalt gepubliceerde publicaties zodat we die op basis van de id kunnen opzoeken.
         /// </summary>
-        internal static async Task<IReadOnlyDictionary<string, OdrcPublicatie>> GetGepubliceerdePublicatieDictionary(HttpClient client, CancellationToken token)
+        private static async Task<IReadOnlyDictionary<string, OdrcPublicatie>> GetGepubliceerdePublicatieDictionary(HttpClient client, CancellationToken token)
         {
             var result = new Dictionary<string, OdrcPublicatie>();
             await foreach (var item in GetAllPages(client, PublicatiesPath, token))
@@ -181,7 +181,7 @@ namespace ODBP.Features.Sitemap.SitemapInstances
         /// <summary>
         /// Zoekt waardes op in een dictionary op basis van een lijst van sleutels.
         /// </summary>
-        public static IEnumerable<T2> LookupValuesInDictionary<T1, T2>(IEnumerable<T1> values, IReadOnlyDictionary<T1, T2> dictionary)
+        private static IEnumerable<T2> LookupValuesInDictionary<T1, T2>(IEnumerable<T1> values, IReadOnlyDictionary<T1, T2> dictionary)
         {
             foreach (var item in values)
             {
@@ -224,14 +224,9 @@ namespace ODBP.Features.Sitemap.SitemapInstances
         public required string Uuid { get; set; }
         public required string Publisher { get; set; }
         public string? Verantwoordelijke { get; set; }
-        public string? OfficieleTitel { get; set; }
-        public string? VerkorteTitel { get; set; }
-        public string? Omschrijving { get; set; }
         public string? Opsteller { get; set; }
-        public DateTimeOffset? Registratiedatum { get; set; }
         public required DateTimeOffset LaatstGewijzigdDatum { get; set; }
         public required IReadOnlyList<string> DiWooInformatieCategorieen { get; set; }
-        public required IReadOnlyList<string> InformatieCategorieen { get; set; }
     }
 
     public class OdrcDocumentHandeling
