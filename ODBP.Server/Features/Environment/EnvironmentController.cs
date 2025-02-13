@@ -20,12 +20,15 @@ namespace ODBP.Features.Environment
             var response = new
             {
                 _resourcesConfig.Name,
-                _resourcesConfig.Website,
-                _resourcesConfig.Logo,
-                _resourcesConfig.Favicon,
-                _resourcesConfig.Image,
-                _resourcesConfig.Tokens,
-                _resourcesConfig.Theme
+                _resourcesConfig.LogoUrl,
+                _resourcesConfig.FaviconUrl,
+                _resourcesConfig.ImageUrl,
+                _resourcesConfig.TokensUrl,
+                _resourcesConfig.Theme,
+                _resourcesConfig.WebsiteUrl,
+                _resourcesConfig.PrivacyUrl,
+                _resourcesConfig.ContactUrl,
+                _resourcesConfig.A11yUrl
             };
 
             return Ok(response);

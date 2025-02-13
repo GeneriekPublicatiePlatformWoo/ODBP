@@ -17,7 +17,7 @@
   --utrecht-page-footer-background-color: var(--utrecht-color-blue-35);
   --utrecht-page-footer-background-image: none;
 
-  --utrecht-button-icon-size: 1.5rem;
+  --utrecht-button-icon-size: var(--utrecht-link-icon-size);
 
   --gpp-woo-card-max-inline-size: calc(var(--utrecht-page-max-inline-size) / 2);
   --gpp-woo-card-background-color: var(--utrecht-surface-background-color);

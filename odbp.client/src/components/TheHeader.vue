@@ -4,10 +4,13 @@
 
     <utrecht-skip-link href="#menu">Naar menu</utrecht-skip-link>
 
-    <router-link :to="{ name: 'home' }">
+    <router-link
+      :to="{ name: 'home' }"
+      class="utrecht-link utrecht-link--html-a utrecht-link--box-content"
+    >
       <img
-        v-if="resources?.logo"
-        :src="resources.logo"
+        v-if="resources?.logoUrl"
+        :src="resources.logoUrl"
         alt="Logo"
         height="100"
         crossorigin="anonymous"
