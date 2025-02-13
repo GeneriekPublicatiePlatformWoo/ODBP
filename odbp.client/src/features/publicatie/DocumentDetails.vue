@@ -38,7 +38,11 @@
           <gpp-woo-icon icon="download" />
 
           Download ({{ documentData?.bestandsnaam.split(".").pop()
-          }}{{ fileSizeKb ? `, ${fileSizeKb}kb` : "" }})
+          }}{{
+            documentData?.bestandsomvang
+              ? `, ${Math.floor(documentData.bestandsomvang / 1024)}kb`
+              : ""
+          }})
         </a>
       </utrecht-paragraph>
 
@@ -132,10 +136,6 @@ const documentRows = computed<Map<string, string | undefined>>(
       ["Geregistreerd op", formatDate(documentData.value?.registratiedatum)],
       ["Laatst gewijzigd op", formatDate(documentData.value?.laatstGewijzigdDatum)]
     ])
-);
-
-const fileSizeKb = computed(() =>
-  documentData.value?.bestandsomvang ? Math.floor(documentData.value.bestandsomvang / 1024) : null
 );
 </script>
 
