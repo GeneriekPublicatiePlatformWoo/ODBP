@@ -18,10 +18,10 @@
           >
         </li>
 
-        <li v-if="resources?.website" class="utrecht-nav-list__item">
+        <li v-if="resources?.websiteUrl" class="utrecht-nav-list__item">
           <utrecht-link
             external
-            :href="resources.website"
+            :href="resources.websiteUrl"
             class="utrecht-nav-list__link gpp-woo-link--icon"
           >
             Naar de gemeente

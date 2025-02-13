@@ -125,14 +125,14 @@ const documentRows = computed<Map<string, string | undefined>>(
   () =>
     new Map([
       ["Identificatie", documentData.value?.identifier],
+      ["Officiële titel", documentData.value?.officieleTitel],
+      ["Verkorte titel", documentData.value?.verkorteTitel],
+      ["Omschrijving", documentData.value?.omschrijving],
       [
         "Eigenaar",
         waardelijsten.value.organisaties.find((o) => o.uuid === publicatieData.value?.publisher)
           ?.naam || "onbekend"
       ],
-      ["Officiële titel", documentData.value?.officieleTitel],
-      ["Verkorte titel", documentData.value?.verkorteTitel],
-      ["Omschrijving", documentData.value?.omschrijving],
       ["Geregistreerd op", formatDate(documentData.value?.registratiedatum)],
       ["Laatst gewijzigd op", formatDate(documentData.value?.laatstGewijzigdDatum)]
     ])

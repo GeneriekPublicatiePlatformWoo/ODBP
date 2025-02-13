@@ -1,22 +1,16 @@
 import { inject, type App } from "vue";
 
-export type GppWooConfig = Partial<{
-  name: string;
-  siteUrl: string;
-  a11yUrl: string;
-  privacyUrl: string;
-  contactUrl: string;
-  resources: Resources;
-}>;
-
 export type Resources = Partial<{
   name: string;
-  website: string;
-  logo: string;
-  favicon: string;
-  image: string;
-  tokens: string;
+  logoUrl: string;
+  faviconUrl: string;
+  imageUrl: string;
+  tokensUrl: string;
   theme: string;
+  websiteUrl: string;
+  privacyUrl: string;
+  contactUrl: string;
+  a11yUrl: string;
 }>;
 
 export const injectResources = () => inject<Resources | null>("resources", null);
@@ -72,10 +66,10 @@ export const loadThemeResources = async (app: App): Promise<void> => {
     // (this is done before mounting the app to prevent layout shifts)
     // Tokens will be loaded directly (as unlayered css, to be sure it takes precedence over the layered project css)
     // Images will be preloaded, waiting to be referenced from the app
-    await loadResources([resources.tokens, resources.logo, resources.image]);
+    await loadResources([resources.tokensUrl, resources.logoUrl, resources.imageUrl]);
 
     // Replace the provided favicon link
-    setIcon(resources.favicon);
+    setIcon(resources.faviconUrl);
 
     // Apply the associated theme class to the root element of the app
     setTheme(resources.theme);

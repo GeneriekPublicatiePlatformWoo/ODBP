@@ -10,14 +10,14 @@ namespace Microsoft.AspNetCore.Builder
 
             var styleSources = new List<string?> {
                 "'self'",
-                resourcesConfig.Tokens
+                resourcesConfig.TokensUrl
             };
 
             var imgSources = new List<string?> {
                 "'self'",
-                resourcesConfig.Favicon,
-                resourcesConfig.Logo,
-                resourcesConfig.Image
+                resourcesConfig.FaviconUrl,
+                resourcesConfig.LogoUrl,
+                resourcesConfig.ImageUrl
             };
 
             return app.UseSecurityHeaders(x => x

@@ -115,6 +115,14 @@ const {
 const publicatieRows = computed<Map<string, string | undefined>>(
   () =>
     new Map([
+      ["Officiële titel", publicatieData.value?.officieleTitel],
+      ["Verkorte titel", publicatieData.value?.verkorteTitel],
+      ["Omschrijving", publicatieData.value?.omschrijving],
+      [
+        "Organisatie",
+        waardelijsten.value.organisaties.find((o) => o.uuid === publicatieData.value?.publisher)
+          ?.naam || "onbekend"
+      ],
       [
         "Informatiecategorieën",
         publicatieData.value?.informatieCategorieen
@@ -125,14 +133,6 @@ const publicatieRows = computed<Map<string, string | undefined>>(
           )
           .join(", ")
       ],
-      [
-        "Organisatie",
-        waardelijsten.value.organisaties.find((o) => o.uuid === publicatieData.value?.publisher)
-          ?.naam || "onbekend"
-      ],
-      ["Officiële titel", publicatieData.value?.officieleTitel],
-      ["Verkorte titel", publicatieData.value?.verkorteTitel],
-      ["Omschrijving", publicatieData.value?.omschrijving],
       ["Geregistreerd op", formatDate(publicatieData.value?.registratiedatum)],
       ["Laatst gewijzigd op", formatDate(publicatieData.value?.laatstGewijzigdDatum)]
     ])

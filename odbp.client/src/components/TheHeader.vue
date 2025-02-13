@@ -9,8 +9,8 @@
       class="utrecht-link utrecht-link--html-a utrecht-link--box-content"
     >
       <img
-        v-if="resources?.logo"
-        :src="resources.logo"
+        v-if="resources?.logoUrl"
+        :src="resources.logoUrl"
         alt="Logo"
         height="100"
         crossorigin="anonymous"
