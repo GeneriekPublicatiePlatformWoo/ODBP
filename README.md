@@ -55,9 +55,14 @@ Op dit moment is de implementatie gebaseerd op alleen het Utrecht Design System,
 | **Page content** (`utrecht-page-content`)     | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-page-content--design-tokens)   |
 | **Page footer** (`utrecht-page-footer`)       | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-page-footer--design-tokens)    |
 | **Navigation bar** (`utrecht-nav-bar`)        | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-nav-bar--design-tokens)        |
+| **Link** (`utrecht-link`)                     | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-link--design-tokens)           |
 | **Skip link** (`utrecht-skip-link`)           | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-skip-link--design-tokens)      |
 | **Article** (`utrecht-article`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-article--design-tokens)        |
 | **Heading** (`utrecht-heading`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-heading-1--design-tokens)      |
 | **Paragraph** (`utrecht-paragraph`)           | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-paragraph--design-tokens)      |
 | **Unordered list** (`utrecht-unordered-list`) | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-unordered-list--design-tokens) |
 | **Button** (`utrecht-button`)                 | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-button--design-tokens)         |
+| **Form field** (`utrecht-form-field`)         | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-form-field--design-tokens)     |
+| **Form label** (`utrecht-form-label`)         | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-form-label--design-tokens)     |
+| **Textbox** (`utrecht-textbox`)               | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-textbox--design-tokens)        |
+| **Table** (`utrecht-table`)                   | [🔗 Design Tokens](https://nl-design-system.github.io/utrecht/storybook/?path=/story/css_css-table--design-tokens)          |
