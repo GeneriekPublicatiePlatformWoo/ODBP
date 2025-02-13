@@ -143,10 +143,4 @@ const publicatieRows = computed<Map<string, string | undefined>>(
 th[scope="row"] {
   inline-size: 20ch;
 }
-
-.gpp-woo-link--icon {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--utrecht-button-icon-gap);
-}
 </style>

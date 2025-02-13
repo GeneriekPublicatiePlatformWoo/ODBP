@@ -1,5 +1,14 @@
 import { inject, type App } from "vue";
 
+export type GppWooConfig = Partial<{
+  name: string;
+  siteUrl: string;
+  a11yUrl: string;
+  privacyUrl: string;
+  contactUrl: string;
+  resources: Resources;
+}>;
+
 export type Resources = Partial<{
   name: string;
   website: string;
