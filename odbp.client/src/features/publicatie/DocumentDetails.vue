@@ -32,12 +32,17 @@
       <utrecht-paragraph>
         <a
           :href="`${API_URL}/documenten/${uuid}/download`"
+          :download="documentData?.bestandsnaam"
           class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
         >
           <gpp-woo-icon icon="download" />
 
           Download ({{ documentData?.bestandsnaam.split(".").pop()
-          }}{{ fileSizeKb ? `, ${fileSizeKb}kb` : "" }})
+          }}{{
+            documentData?.bestandsomvang
+              ? `, ${Math.floor(documentData.bestandsomvang / 1024)}kb`
+              : ""
+          }})
         </a>
       </utrecht-paragraph>
 
@@ -56,7 +61,13 @@
         <utrecht-table-body>
           <utrecht-table-row>
             <utrecht-table-header-cell scope="row">Officiële titel</utrecht-table-header-cell>
-            <utrecht-table-cell>{{ publicatieData?.officieleTitel }}</utrecht-table-cell>
+            <utrecht-table-cell>
+              <router-link
+                :to="{ name: 'publicatie', params: { uuid: publicatieData?.uuid } }"
+                class="utrecht-link utrecht-link--html-a"
+                >{{ publicatieData?.officieleTitel }}</router-link
+              >
+            </utrecht-table-cell>
           </utrecht-table-row>
 
           <utrecht-table-row>
@@ -125,12 +136,6 @@ const documentRows = computed<Map<string, string | undefined>>(
       ["Geregistreerd op", formatDate(documentData.value?.registratiedatum)],
       ["Laatst gewijzigd op", formatDate(documentData.value?.laatstGewijzigdDatum)]
     ])
-);
-
-const fileSizeKb = computed(() =>
-  documentData.value?.bestandsomvang
-    ? Math.floor(documentData.value.bestandsomvang / 1024)
-    : null
 );
 </script>
 
