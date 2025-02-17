@@ -15,13 +15,8 @@ namespace ODBP.Apis.Search;
 /// <param name="elastic"></param>
 public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elastic) : ISearchClient
 {
-    const string ApiVersion = "v1";
-    const string ApiRoot = $"/api/{ApiVersion}";
-    const string OrganisatiesPath = $"{ApiRoot}/organisaties?isActief=alle";
-    const string InformatieCategorieenPath = $"{ApiRoot}/informatiecategorieen";
-    const string DocumentenRoot = $"{ApiRoot}/documenten";
-    const string DocumentenQueryPath = $"{DocumentenRoot}?publicatiestatus=gepubliceerd&sorteer=creatiedatum";
     private const string IndexName = "woo-mock";
+    private const string KeywordSuffix = "keyword";
     private static readonly string[] s_fields = ["officieleTitel", "verkorteTitel", "omschrijving", "identificatie"];
 
     public static IServiceCollection AddToServices(IServiceCollection services, IConfiguration config)
@@ -62,14 +57,9 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
                     }
                 }))
             .Aggregations(aa => aa
-                .Add(nameof(SearchResult.InformatieCategorieen), a => a
-                    .Nested(n => n.Path(r => r.InformatieCategorieen))
-                        .Aggregations(zzz => zzz.Add(nameof(SearchResult.InformatieCategorieen), xxx => xxx.MultiTerms(t => t.Terms(r => r.Field(z => z.InformatieCategorieen[0].Uuid), r => r.Field(z => z.InformatieCategorieen[0].Name))))))
-                .Add(nameof(SearchResult.Publisher), a => a
-                    .Nested(n => n.Path(r => r.Publisher))
-                        .Aggregations(zzz => zzz.Add(nameof(SearchResult.Publisher), xxx => xxx.MultiTerms(t => t.Terms(r => r.Field(z => z.Publisher.Uuid), r => r.Field(z => z.Publisher.Name))))))
-                .Add(nameof(SearchResult.ResultType), a => a
-                    .Terms(t => t.Field(r => r.ResultType))))
+                .Add(nameof(SearchResult.InformatieCategorieen), a => a.MultiTerms(t => t.Terms(r => r.Field(z => z.InformatieCategorieen[0].Uuid.Suffix(KeywordSuffix)), r => r.Field(z => z.InformatieCategorieen[0].Name.Suffix(KeywordSuffix)))))
+                .Add(nameof(SearchResult.Publisher), a => a.MultiTerms(t => t.Terms(r => r.Field(z => z.Publisher.Uuid.Suffix(KeywordSuffix)), r => r.Field(z => z.Publisher.Name.Suffix(KeywordSuffix)))))
+                .Add(nameof(SearchResult.ResultType), a => a.Terms(t => t.Field(r => r.ResultType.Suffix(KeywordSuffix)))))
             .Sort(GetSort(request))
             , token);
 
@@ -101,8 +91,8 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
             Count = response.Total,
             Facets = new Facets
             {
-                InformatieCategorieen = response.Aggregations.GetNested(nameof(SearchResult.InformatieCategorieen))?.Aggregations.GetMultiTerms(nameof(SearchResult.InformatieCategorieen))?.Buckets.Select(b => new Bucket() { Count = b.DocCount, Name = b.Key.ElementAt(1).ToString(), Uuid = b.Key.ElementAt(0).ToString() }).ToArray() ?? [],
-                Organisaties = response.Aggregations.GetNested(nameof(SearchResult.Publisher))?.Aggregations.GetMultiTerms(nameof(SearchResult.Publisher))?.Buckets.Select(b => new Bucket() { Count = b.DocCount, Name = b.Key.ElementAt(1).ToString(), Uuid = b.Key.ElementAt(0).ToString() }).ToArray() ?? [],
+                InformatieCategorieen = response.Aggregations.GetMultiTerms(nameof(SearchResult.InformatieCategorieen))?.Buckets.Select(b => new Bucket() { Count = b.DocCount, Name = b.Key.ElementAt(1).ToString(), Uuid = b.Key.ElementAt(0).ToString() }).ToArray() ?? [],
+                Organisaties = response.Aggregations.GetMultiTerms(nameof(SearchResult.Publisher))?.Buckets.Select(b => new Bucket() { Count = b.DocCount, Name = b.Key.ElementAt(1).ToString(), Uuid = b.Key.ElementAt(0).ToString() }).ToArray() ?? [],
                 ResultTypes = response.Aggregations.GetStringTerms(nameof(SearchResult.ResultType))?.Buckets.Select(b => new ResultTypeBucket() { Count = b.DocCount, Name = Enum.Parse<ResultType>(b.Key.ToString()) }).ToArray() ?? []
             },
             Results = response.Documents,
@@ -131,38 +121,30 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
                 .Fuzziness(new(2)));
         }
 
-        var publishers = request.Publishers.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => FieldValue.String(x)).ToArray();
-        if (publishers.Length > 0)
-        {
-            yield return f => f.Nested(n => n
-                .Path(r => r.Publisher)
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(ff => ff
-                            .Terms(t => t
-                                .Field(r => r.Publisher.Uuid)
-                                .Terms(new TermsQueryField(publishers)))))));
-        }
-        var info = request.InformatieCategorieen.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => FieldValue.String(x)).ToArray();
-        if (info.Length > 0)
-        {
-            yield return f => f.Nested(n => n
-                .Path(r => r.InformatieCategorieen)
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(ff => ff
-                            .Terms(t => t
-                                .Field(r => r.InformatieCategorieen[0].Uuid)
-                                .Terms(new TermsQueryField(info)))))));
-        }
     }
 
     private static IEnumerable<Action<QueryDescriptor<SearchResult>>> GetFilters(SearchRequest request)
     {
 
+
+        var publishers = request.Publishers.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => FieldValue.String(x)).ToArray();
+        if (publishers.Length > 0)
+        {
+            yield return f => f.Terms(t => t
+                .Field(r => r.Publisher.Uuid.Suffix(KeywordSuffix))
+                .Terms(new TermsQueryField(publishers)));
+        }
+        var info = request.InformatieCategorieen.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => FieldValue.String(x)).ToArray();
+        if (info.Length > 0)
+        {
+            yield return f => f.Terms(t => t
+                .Field(r => r.InformatieCategorieen[0].Uuid.Suffix(KeywordSuffix))
+                .Terms(new TermsQueryField(info)));
+        }
+
         if (request.ResultType.HasValue)
         {
-            yield return f => f.Term(t => t.Field(r => r.ResultType).Value(request.ResultType.Value.ToString()));
+            yield return f => f.Term(t => t.Field(r => r.ResultType.Suffix(KeywordSuffix)).Value(request.ResultType.Value.ToString()));
         }
         if (request.RegistratiedatumVanaf.HasValue || request.RegistratiedatumTot.HasValue)
         {
@@ -211,11 +193,7 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
 
         try
         {
-            await elasticsearch.Indices.CreateAsync<SearchResult>(IndexName, i => i.Mappings(m => m.Properties(p => p
-                .Keyword(p => p.ResultType)
-                .Nested(p => p.InformatieCategorieen, zz => zz.Properties(xx => xx.Keyword(yy => yy.InformatieCategorieen[0].Uuid).Keyword(yy => yy.InformatieCategorieen[0].Name)))
-                .Nested(p => p.Publisher, zz => zz.Properties(xx => xx.Keyword(yy => yy.Publisher.Uuid).Keyword(yy => yy.Publisher.Name)))
-                )), default);
+            await elasticsearch.Indices.CreateAsync<SearchResult>(IndexName);
 
             await foreach (var item in GetRecordsFromFile(default))
             {
