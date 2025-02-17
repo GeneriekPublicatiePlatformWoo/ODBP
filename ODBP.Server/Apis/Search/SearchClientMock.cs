@@ -19,11 +19,40 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
     private const string KeywordSuffix = "keyword";
     private static readonly string[] s_fields = ["officieleTitel", "verkorteTitel", "omschrijving", "identificatie"];
 
+    private static string PascalToSnake(string pascal)
+    {
+        var from = pascal.AsSpan();
+        Span<char> result = stackalloc char[pascal.Length * 2];
+        var length = 0;
+        var current = result;
+        for (int i = 0; i < from.Length; i++)
+        {
+            var c = from[i];
+            var lower = char.ToLowerInvariant(c);
+            if (i == 0 || i >= current.Length || lower == c)
+            {
+                current[0] = lower;
+                current = current.Slice(1);
+                length++;
+            }
+            else
+            {
+                current[0] = '_';
+                current[1] = lower;
+                current = current.Slice(2);
+                length += 2;
+            }
+        }
+        return result.Slice(0, length).ToString();
+    }
+
     public static IServiceCollection AddToServices(IServiceCollection services, IConfiguration config)
     {
         var settings = new ElasticsearchClientSettings(new Uri(config["ELASTICSEARCH_BASE_URL"]))
             .Authentication(new BasicAuthentication(config["ELASTICSEARCH_USERNAME"], config["ELASTICSEARCH_PASSWORD"]))
-            .DisableDirectStreaming();
+            .DisableDirectStreaming()
+            .DefaultFieldNameInferrer(PascalToSnake)
+            ;
         var elasticsearch = new ElasticsearchClient(settings);
         services.AddSingleton(elasticsearch);
         services.AddSingleton<ISearchClient, SearchClientMock>();
@@ -120,13 +149,10 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
                 .Query(request.Query)
                 .Fuzziness(new(2)));
         }
-
     }
 
     private static IEnumerable<Action<QueryDescriptor<SearchResult>>> GetFilters(SearchRequest request)
     {
-
-
         var publishers = request.Publishers.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => FieldValue.String(x)).ToArray();
         if (publishers.Length > 0)
         {
@@ -193,7 +219,7 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
 
         try
         {
-            await elasticsearch.Indices.CreateAsync<SearchResult>(IndexName);
+            await elasticsearch.Indices.CreateAsync(IndexName);
 
             await foreach (var item in GetRecordsFromFile(default))
             {
@@ -207,15 +233,15 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
 
     private static readonly JsonSerializerOptions s_serializerOptions = new(JsonSerializerDefaults.Web);
 
-    private static async IAsyncEnumerable<SearchResult> GetRecordsFromFile([EnumeratorCancellation] CancellationToken token)
+    private static async IAsyncEnumerable<JsonElement> GetRecordsFromFile([EnumeratorCancellation] CancellationToken token)
     {
         var assembly = Assembly.GetExecutingAssembly();
         var qualifiedName = assembly.GetManifestResourceNames().FirstOrDefault(x => x.Contains("mock-content.json"));
         if (string.IsNullOrWhiteSpace(qualifiedName)) yield break;
         await using var stream = assembly.GetManifestResourceStream(qualifiedName)!;
-        await foreach (var item in JsonSerializer.DeserializeAsyncEnumerable<SearchResult>(stream, s_serializerOptions, cancellationToken: token).WithCancellation(token))
+        await foreach (var item in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(stream, s_serializerOptions, cancellationToken: token).WithCancellation(token))
         {
-            if (item != null) yield return item;
+            if (item.ValueKind == JsonValueKind.Object) yield return item;
         }
     }
     #endregion
