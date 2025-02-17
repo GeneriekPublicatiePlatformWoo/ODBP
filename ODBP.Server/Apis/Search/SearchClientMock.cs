@@ -17,7 +17,7 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
 {
     private const string IndexName = "woo-mock";
     private const string KeywordSuffix = "keyword";
-    private static readonly string[] s_fields = ["officieleTitel", "verkorteTitel", "omschrijving", "identificatie"];
+    private static readonly string[] s_fields = ["officiele_titel", "verkorte_titel", "omschrijving", "identificatie"];
 
     private static string PascalToSnake(string pascal)
     {
