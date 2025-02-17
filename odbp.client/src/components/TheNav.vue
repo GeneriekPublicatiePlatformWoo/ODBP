@@ -18,10 +18,18 @@
           >
         </li>
 
-        <li v-if="resources?.website" class="utrecht-nav-list__item">
-          <utrecht-link external :href="resources.website" class="utrecht-nav-list__link"
-            >Naar de gemeente</utrecht-link
+        <li v-if="resources?.websiteUrl" class="utrecht-nav-list__item">
+          <utrecht-link
+            external
+            :href="resources.websiteUrl"
+            class="utrecht-nav-list__link gpp-woo-link--icon"
           >
+            Naar de gemeente
+
+            <span class="visually-hidden">(externe link)</span>
+
+            <gpp-woo-icon icon="external" />
+          </utrecht-link>
         </li>
       </ul>
     </div>
@@ -30,6 +38,13 @@
 
 <script setup lang="ts">
 import { injectResources } from "@/resources";
+import GppWooIcon from "@/components/GppWooIcon.vue";
 
 const resources = injectResources();
 </script>
+
+<style lang="scss" scoped>
+.gpp-woo-link--icon {
+  --utrecht-link-icon-size: 0.75rem;
+}
+</style>

@@ -2,8 +2,8 @@
   <section class="gpp-woo-hero">
     <div class="utrecht-page utrecht-page-content">
       <img
-        v-if="resources?.image"
-        :src="resources.image"
+        v-if="resources?.imageUrl"
+        :src="resources.imageUrl"
         class="gpp-woo-hero-image"
         alt="Afbeelding gemeente"
         crossorigin="anonymous"
