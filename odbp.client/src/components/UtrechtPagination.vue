@@ -50,31 +50,41 @@ const props = defineProps<{
     next?: string;
     previous?: string;
   };
+  page: number;
   getRoute: (v: number) => RouteLocationRaw;
 }>();
 
-const page = defineModel<number>("page", { required: true });
-
 const utrechtProps = computed(() => {
+  const {
+    page,
+    getRoute,
+    pagination: { count, results, next, previous }
+  } = props;
+
   const pageSize =
-    props.pagination.next || !props.pagination.previous
-      ? props.pagination.results.length
-      : (props.pagination.count - props.pagination.results.length) / (page.value - 1);
+    next || !previous
+      ? // if there is a next page, the current page length is the expected page size
+        // if there is only one page, all we know is the length of that page
+        results.length
+      : // otherwise, we can calculate the page size
+        (count - results.length) / (page - 1);
 
   const totalPages = Math.ceil(props.pagination.count / pageSize);
 
   const getLink = (i: number) => ({
-    href: props.getRoute(i),
-    title: `Resultaat ${i * pageSize + 1} tot ${Math.min(props.pagination.count, (i + 1) * pageSize)}`,
-    current: i === page.value,
+    href: getRoute(i),
+    title: `Resultaat ${(i - 1) * pageSize + 1} tot ${Math.min(count, i * pageSize)}`,
+    current: i === page,
     number: i
   });
 
+  // we want to show a maximum of 4 pages, but the current page will not always be in the middle
   const max = 4;
 
-  let lower = page.value;
-  let upper = page.value;
+  let lower = page;
+  let upper = lower;
 
+  // thats why we want to calculate the minimum and maximum page here
   while (upper - lower < max && (lower > 1 || totalPages > upper)) {
     lower = Math.max(1, lower - 1);
     upper = Math.min(totalPages, upper + 1);
@@ -91,14 +101,11 @@ const utrechtProps = computed(() => {
 
   links.push(getLink(totalPages));
 
-  const prev = props.pagination.previous ? getLink(page.value - 1) : undefined;
-  const next = props.pagination.next ? getLink(page.value + 1) : undefined;
-
   return {
-    currentIndex: page.value,
     links,
-    prev,
-    next
+    currentIndex: page,
+    prev: previous ? getLink(page - 1) : undefined,
+    next: next ? getLink(page + 1) : undefined
   };
 });
 </script>

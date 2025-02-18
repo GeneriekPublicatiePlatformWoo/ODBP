@@ -25,11 +25,16 @@
 
     <SimpleSpinner v-if="loading" />
 
+    <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
+
     <div v-else-if="showResults">
       <template v-if="response?.results?.length">
         <p>{{ response.count }} gevonden</p>
         <ol>
-          <li v-for="{ uuid, officieleTitel, resultType } in response.results" :key="uuid">
+          <li
+            v-for="({ uuid, officieleTitel, resultType }, idx) in response.results"
+            :key="uuid + idx"
+          >
             <router-link
               :to="`/${resultType === 'Document' ? 'documenten' : 'publicaties'}/${uuid}`"
             >
@@ -37,7 +42,7 @@
             </router-link>
           </li>
         </ol>
-        <UtrechtPagination :pagination="response" v-model:page="page" :get-route="getRoute" />
+        <UtrechtPagination :pagination="response" :page="page" :get-route="getRoute" />
       </template>
       <p v-else>Geen resultaten gevonden</p>
     </div>
@@ -47,22 +52,16 @@
 <script setup lang="ts">
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
-import { computed, ref, watchEffect } from "vue";
+import { useRouteQuery } from "@vueuse/router";
+import { ref, watchEffect } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 
 let controller: AbortController | null = null;
 
 const route = useRoute();
 
-const query = computed({
-  get: () => (typeof route.query.query === "string" ? route.query.query : undefined),
-  set: (v) => (route.query.query = v || [])
-});
-
-const page = computed({
-  get: () => (typeof route.query.page === "string" ? +route.query.page : 1),
-  set: (v) => (route.query.page = v.toString())
-});
+const query = useRouteQuery<string | null>("query", null);
+const page = useRouteQuery("page", "1", { transform: Number });
 
 const zoekVeld = ref<string>(query.value || "");
 const loading = ref(false);
@@ -72,8 +71,8 @@ const response = ref();
 const showResults = ref(false);
 
 const search = () => {
-  query.value = zoekVeld.value;
   page.value = 1;
+  query.value = zoekVeld.value;
 };
 
 const getRoute = (page: number): RouteLocationRaw => ({
@@ -85,24 +84,46 @@ const getRoute = (page: number): RouteLocationRaw => ({
 });
 
 watchEffect(() => {
-  if (query.value === undefined) return;
-  controller?.abort();
+  if (typeof query.value !== "string") return;
+
+  if (controller) {
+    controller.abort();
+    controller.signal.onabort = null;
+  }
+
   controller = new AbortController();
+  const signal = controller.signal;
+
   const setLoadingTimeout = setTimeout(() => {
     loading.value = true;
   }, 200);
-  controller.signal.addEventListener("abort", () => clearTimeout(setLoadingTimeout));
+  const clearLoadingTimeout = () => clearTimeout(setLoadingTimeout);
+  signal.onabort = clearLoadingTimeout;
+
   error.value = false;
-  fetch(`/api/zoeken?${new URLSearchParams({ query: query.value, page: page.value.toString() })}`, {
-    signal: controller.signal
-  })
-    .finally(() => clearTimeout(setLoadingTimeout))
+
+  fetch(
+    `/api/zoeken?${new URLSearchParams([
+      ["query", query.value],
+      ["page", page.value.toString()]
+    ])}`,
+    {
+      signal
+    }
+  )
+    .finally(clearLoadingTimeout)
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((r) => {
       showResults.value = true;
       response.value = r;
     })
-    .catch(() => (error.value = true))
+    .catch((reason) => {
+      if (!signal.aborted) {
+        error.value = true;
+      } else {
+        console.log(reason);
+      }
+    })
     .finally(() => (loading.value = false));
 });
 </script>
