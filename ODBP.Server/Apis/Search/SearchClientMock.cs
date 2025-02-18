@@ -97,36 +97,40 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
             throw new Exception();
         }
 
-        var queryDict = acc.HttpContext?.Request.Query.ToDictionary(StringComparer.OrdinalIgnoreCase) ?? [];
-        queryDict["pageSize"] = validPageSize.ToString();
-        var path = $"/api/zoeken";
-        string? previous = null;
-        string? next = null;
-
-        if (response.Total > validPage * validPageSize)
-        {
-            queryDict["page"] = (validPage + 1).ToString();
-            next = QueryHelpers.AddQueryString(path, queryDict);
-        }
-
-        if (validPage > 1)
-        {
-            queryDict["page"] = (validPage - 1).ToString();
-            previous = QueryHelpers.AddQueryString(path, queryDict);
-        }
-
         return new PaginatedSearchResults
         {
             Count = response.Total,
             Facets = new Facets
             {
-                InformatieCategorieen = response.Aggregations.GetMultiTerms(nameof(SearchResult.InformatieCategorieen))?.Buckets.Select(b => new Bucket() { Count = b.DocCount, Name = b.Key.ElementAt(1).ToString(), Uuid = b.Key.ElementAt(0).ToString() }).ToArray() ?? [],
-                Organisaties = response.Aggregations.GetMultiTerms(nameof(SearchResult.Publisher))?.Buckets.Select(b => new Bucket() { Count = b.DocCount, Name = b.Key.ElementAt(1).ToString(), Uuid = b.Key.ElementAt(0).ToString() }).ToArray() ?? [],
-                ResultTypes = response.Aggregations.GetStringTerms(nameof(SearchResult.ResultType))?.Buckets.Select(b => new ResultTypeBucket() { Count = b.DocCount, Name = Enum.Parse<ResultType>(b.Key.ToString()) }).ToArray() ?? []
+                InformatieCategorieen = response.Aggregations
+                    .GetMultiTerms(nameof(SearchResult.InformatieCategorieen))
+                    ?.Buckets.Select(b => new Bucket
+                    {
+                        Count = b.DocCount,
+                        Name = b.Key.ElementAt(1).ToString(),
+                        Uuid = b.Key.ElementAt(0).ToString()
+                    })
+                    .ToArray() ?? [],
+                Organisaties = response.Aggregations
+                    .GetMultiTerms(nameof(SearchResult.Publisher))
+                    ?.Buckets.Select(b => new Bucket
+                    {
+                        Count = b.DocCount,
+                        Name = b.Key.ElementAt(1).ToString(),
+                        Uuid = b.Key.ElementAt(0).ToString()
+                    }).ToArray() ?? [],
+                ResultTypes = response.Aggregations
+                    .GetStringTerms(nameof(SearchResult.ResultType))
+                    ?.Buckets.Select(b => new ResultTypeBucket
+                    {
+                        Count = b.DocCount,
+                        Name = Enum.Parse<ResultType>(b.Key.ToString())
+                    })
+                    .ToArray() ?? []
             },
             Results = response.Documents,
-            Next = next,
-            Previous = previous,
+            Next = response.Total > validPage * validPageSize,
+            Previous = validPage > 1,
         };
     }
 

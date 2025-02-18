@@ -47,8 +47,8 @@ const props = defineProps<{
   pagination: {
     count: number;
     results: unknown[];
-    next?: string;
-    previous?: string;
+    next: boolean;
+    previous: boolean;
   };
   page: number;
   getRoute: (v: number) => RouteLocationRaw;

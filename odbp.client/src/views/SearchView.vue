@@ -105,15 +105,17 @@ watchEffect(() => {
 
   error.value = false;
 
-  fetch(
-    `/api/zoeken?${new URLSearchParams([
-      ["query", query.value],
-      ["page", page.value.toString()]
-    ])}`,
-    {
-      signal
-    }
-  )
+  fetch("/api/zoeken", {
+    body: JSON.stringify({
+      query: query.value,
+      page: page.value
+    }),
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    signal
+  })
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((r) => {
       showResults.value = true;

@@ -3,8 +3,8 @@
 public record PaginatedSearchResults
 {
     public required long Count { get; init; }
-    public string? Previous { get; init; }
-    public string? Next { get; init; }
+    public bool Previous { get; init; }
+    public bool Next { get; init; }
     public required IReadOnlyCollection<SearchResult> Results { get; init; }
     public Facets? Facets { get; init; }
 }
