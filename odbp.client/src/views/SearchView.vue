@@ -23,7 +23,7 @@
       </div>
     </form>
 
-    <SimpleSpinner v-if="loading" />
+    <simple-spinner v-if="loading" />
 
     <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
 
@@ -42,7 +42,7 @@
             </router-link>
           </li>
         </ol>
-        <UtrechtPagination :pagination="response" :page="page" :get-route="getRoute" />
+        <utrecht-pagination :pagination="response" :page="page" :get-route="getRoute" />
       </template>
       <p v-else>Geen resultaten gevonden</p>
     </div>
