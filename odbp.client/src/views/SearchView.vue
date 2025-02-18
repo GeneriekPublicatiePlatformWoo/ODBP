@@ -83,7 +83,7 @@
             </article>
           </li>
         </ol>
-        <utrecht-pagination :pagination="data" :page="page" :get-route="getRoute" />
+        <utrecht-pagination v-if="pagination" v-bind="pagination" />
       </template>
       <p v-else>Geen resultaten gevonden</p>
     </div>
@@ -94,9 +94,11 @@
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
 import { useLoader } from "@/composables/use-loader";
+import { useSpinner } from "@/composables/use-spinner";
 import { type Sort, sortOptions, search } from "@/features/search/service";
+import { mapPaginatedResultsToUtrechtPagination } from "@/helpers/pagination";
 import { useRouteQuery } from "@vueuse/router";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 
 const route = useRoute();
@@ -122,7 +124,7 @@ const getRoute = (page: number): RouteLocationRaw => ({
   }
 });
 
-const { error, showSpinner, data } = useLoader((signal) => {
+const { error, loading, data } = useLoader((signal) => {
   if (typeof query.value === "string")
     return search({
       query: query.value,
@@ -131,6 +133,14 @@ const { error, showSpinner, data } = useLoader((signal) => {
       signal
     });
 });
+
+const showSpinner = useSpinner(loading);
+
+const pagination = computed(
+  () =>
+    data.value &&
+    mapPaginatedResultsToUtrechtPagination({ page: page.value, pagination: data.value, getRoute })
+);
 
 const truncate = (s: string, ch: number) => {
   if (s.length <= ch) return s;

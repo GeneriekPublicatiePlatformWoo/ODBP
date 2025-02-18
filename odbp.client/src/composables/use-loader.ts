@@ -1,27 +1,9 @@
 import { asyncComputed } from "@vueuse/core";
-import { ref, watch } from "vue";
+import { readonly, ref } from "vue";
 
-export function useLoader<T>(
-  fetcher: (signal: AbortSignal) => Promise<T> | undefined,
-  options?: { showSpinnerAfterMs?: number }
-) {
-  const showSpinner = ref(false);
+export function useLoader<T>(fetcher: (signal: AbortSignal) => Promise<T> | undefined) {
   const error = ref(false);
   const loading = ref(true);
-  let timeout: number | undefined;
-
-  watch(loading, (l) => {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-    if (l) {
-      timeout = setTimeout(() => {
-        showSpinner.value = true;
-      }, options?.showSpinnerAfterMs ?? 200);
-    } else {
-      showSpinner.value = false;
-    }
-  });
 
   const data = asyncComputed(
     (onCancel) => {
@@ -42,9 +24,8 @@ export function useLoader<T>(
     loading
   );
   return {
-    error,
-    loading,
-    showSpinner,
-    data
+    error: readonly(error),
+    loading: readonly(loading),
+    data: readonly(data)
   };
 }
