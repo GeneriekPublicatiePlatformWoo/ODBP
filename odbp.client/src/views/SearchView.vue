@@ -87,18 +87,21 @@ watchEffect(() => {
   if (typeof query.value !== "string") return;
 
   if (controller) {
+    // cancel any in-flight fetch requests
+    // because we're only interested in the latest result
     controller.abort();
-    controller.signal.onabort = null;
   }
 
   controller = new AbortController();
   const signal = controller.signal;
 
+  // only show a spinner if the request takes longer than 200 ms.
+  // otherwise, we don't want to disrupt the users's flow
   const setLoadingTimeout = setTimeout(() => {
     loading.value = true;
   }, 200);
   const clearLoadingTimeout = () => clearTimeout(setLoadingTimeout);
-  signal.onabort = clearLoadingTimeout;
+  signal.addEventListener("abort", clearLoadingTimeout);
 
   error.value = false;
 
@@ -111,19 +114,25 @@ watchEffect(() => {
       signal
     }
   )
-    .finally(clearLoadingTimeout)
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((r) => {
       showResults.value = true;
       response.value = r;
     })
     .catch((reason) => {
-      if (!signal.aborted) {
-        error.value = true;
-      } else {
+      // if the signal is aborted, fetch throws an Error.
+      // we don't want to disrupt the user's flow for this.
+      if (signal.aborted) {
+        // but we log the reason for debugging purposes
         console.log(reason);
+      } else {
+        // any other error is unexpected and should disrupt the flow
+        error.value = true;
       }
     })
-    .finally(() => (loading.value = false));
+    .finally(() => {
+      clearLoadingTimeout();
+      loading.value = false;
+    });
 });
 </script>
