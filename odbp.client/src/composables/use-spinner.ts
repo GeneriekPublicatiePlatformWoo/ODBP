@@ -9,7 +9,7 @@ export const useSpinner = (
   const loadingRef = toRef(loading);
   const showSpinner = ref(false);
 
-  let timeout: number | undefined;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
 
   watch(
     loadingRef,
