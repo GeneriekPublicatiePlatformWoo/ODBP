@@ -1,11 +1,11 @@
 <template>
   <nav class="utrecht-pagination">
-    <span class="utrecht-pagination__before" v-if="utrechtProps.prev">
+    <span class="utrecht-pagination__before vorige">
       <router-link
+        v-if="utrechtProps.prev"
         :to="utrechtProps.prev.href"
         class="utrecht-pagination__relative-link utrecht-pagination__relative-link--prev"
         rel="prev"
-        :replace="true"
       >
         Vorige
       </router-link>
@@ -19,17 +19,16 @@
           link.current && 'utrecht-pagination__page-link--current'
         ]"
         :to="link.href"
-        :replace="true"
         :aria-current="link.current ? 'true' : undefined"
         :title="link.title"
       >
         {{ link.number }}
       </router-link>
     </span>
-    <span class="utrecht-pagination__before" v-if="utrechtProps.next">
+    <span class="utrecht-pagination__before volgende">
       <router-link
+        v-if="utrechtProps.next"
         :to="utrechtProps.next.href"
-        :replace="true"
         class="utrecht-pagination__relative-link utrecht-pagination__relative-link--next"
         rel="next"
       >
@@ -108,8 +107,19 @@ const utrechtProps = computed(() => {
   return {
     links,
     currentIndex: page,
-    prev: previous ? getLink(page - 1) : undefined,
-    next: next ? getLink(page + 1) : undefined
+    prev: page > 1 ? getLink(page - 1) : undefined,
+    next: page < totalPages ? getLink(page + 1) : undefined
   };
 });
 </script>
+
+<style lang="scss" scoped>
+.vorige {
+  min-inline-size: 8.5ch;
+  display: inline-block;
+}
+.volgende {
+  min-inline-size: 19ch;
+  display: inline-block;
+}
+</style>
