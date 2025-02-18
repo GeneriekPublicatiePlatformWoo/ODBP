@@ -90,16 +90,20 @@ const utrechtProps = computed(() => {
     upper = Math.min(totalPages, upper + 1);
   }
 
-  const links = [getLink(1)];
+  const links = [];
+
+  if (lower > 1) {
+    links.push(getLink(1));
+  }
 
   for (let index = 0; index <= upper - lower; index++) {
     const number = index + lower;
-    if (number !== 1 && number !== totalPages) {
-      links.push(getLink(number));
-    }
+    links.push(getLink(number));
   }
 
-  links.push(getLink(totalPages));
+  if (totalPages > upper) {
+    links.push(getLink(totalPages));
+  }
 
   return {
     links,
