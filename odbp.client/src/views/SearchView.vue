@@ -2,9 +2,11 @@
   <utrecht-article>
     <utrecht-heading :level="1">Zoeken</utrecht-heading>
 
-    <form class="utrecht-form" @submit.prevent="search">
+    <form class="utrecht-form" @submit.prevent="submit">
       <div class="utrecht-form-fieldset">
-        <fieldset class="utrecht-form-fieldset__fieldset utrecht-form-fieldset--html-fieldset">
+        <fieldset
+          class="utrecht-form-fieldset__fieldset utrecht-form-fieldset--html-fieldset search-fieldset"
+        >
           <utrecht-form-field
             ><utrecht-form-label
               for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
@@ -18,31 +20,69 @@
               placeholder="Hier zoeken"
               v-model="zoekVeld"
               type="search"
+              autocomplete="off"
+              spelcheck="false"
+              enterkeyhint="search"
           /></utrecht-form-field>
+          <utrecht-button type="submit" :appearance="'primary-action-button'"
+            >Zoeken</utrecht-button
+          >
+        </fieldset>
+      </div>
+      <div class="utrecht-form-fieldset">
+        <fieldset class="utrecht-form-fieldset__fieldset utrecht-form-fieldset--html-fieldset">
+          <utrecht-form-field
+            ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
+              >Sorteren</utrecht-form-label
+            >
+            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+          </utrecht-form-field>
         </fieldset>
       </div>
     </form>
 
-    <simple-spinner v-if="loading" />
+    <simple-spinner v-if="showSpinner" />
 
     <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
 
-    <div v-else-if="showResults">
-      <template v-if="response?.results?.length">
-        <p>{{ response.count }} gevonden</p>
+    <div v-else-if="data">
+      <template v-if="data.results.length">
+        <p>{{ data.count }} gevonden</p>
         <ol>
           <li
-            v-for="({ uuid, officieleTitel, resultType }, idx) in response.results"
+            v-for="(
+              {
+                uuid,
+                officieleTitel,
+                resultType,
+                informatieCategorieen,
+                publisher,
+                laatstGewijzigdDatum,
+                omschrijving
+              },
+              idx
+            ) in data.results"
             :key="uuid + idx"
           >
-            <router-link
-              :to="`/${resultType === 'Document' ? 'documenten' : 'publicaties'}/${uuid}`"
-            >
-              {{ officieleTitel }}
-            </router-link>
+            <article>
+              <router-link
+                :to="`/${resultType === 'Document' ? 'documenten' : 'publicaties'}/${uuid}`"
+              >
+                {{ officieleTitel }}
+              </router-link>
+              <ul>
+                <li>{{ resultType }}</li>
+                <li v-for="categorie in informatieCategorieen" :key="categorie.uuid">
+                  {{ categorie.name }}
+                </li>
+                <li>{{ publisher.name }}</li>
+                <li>{{ laatstGewijzigdDatum }}</li>
+              </ul>
+              <p>{{ truncate(omschrijving, 200) }}</p>
+            </article>
           </li>
         </ol>
-        <utrecht-pagination :pagination="response" :page="page" :get-route="getRoute" />
+        <utrecht-pagination :pagination="data" :page="page" :get-route="getRoute" />
       </template>
       <p v-else>Geen resultaten gevonden</p>
     </div>
@@ -52,32 +92,23 @@
 <script setup lang="ts">
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
+import { useLoader } from "@/composables/use-loader";
+import { type Sort, sortOptions, search } from "@/features/search/service";
 import { useRouteQuery } from "@vueuse/router";
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
-
-type SearchResponse = {
-  results: { uuid: string; officieleTitel: string; resultType: "Document" | "Publication" }[];
-  count: number;
-  next: boolean;
-  previous: boolean;
-};
-
-let controller: AbortController | null = null;
 
 const route = useRoute();
 
 const query = useRouteQuery<string | null>("query", null);
 const page = useRouteQuery("page", "1", { transform: Number });
+const sort = useRouteQuery<Sort>("sort", sortOptions.relevance.value, {
+  transform: (v) => (v === sortOptions.chronological.value ? v : sortOptions.relevance.value)
+});
 
-const zoekVeld = ref<string>(query.value || "");
-const loading = ref(false);
-const error = ref(false);
-const response = ref<SearchResponse>();
+const zoekVeld = ref(query.value || "");
 
-const showResults = ref(false);
-
-const search = () => {
+const submit = () => {
   page.value = 1;
   query.value = zoekVeld.value;
 };
@@ -90,59 +121,30 @@ const getRoute = (page: number): RouteLocationRaw => ({
   }
 });
 
-watchEffect(() => {
-  if (typeof query.value !== "string") return;
-
-  if (controller) {
-    // cancel any in-flight fetch requests
-    // because we're only interested in the latest result
-    controller.abort();
-  }
-
-  controller = new AbortController();
-  const signal = controller.signal;
-
-  // only show a spinner if the request takes longer than 200 ms.
-  // otherwise, we don't want to disrupt the users's flow
-  const SHOW_LOADING_AFTER_MILISECONDS = 200;
-  const setLoadingTimeout = setTimeout(() => {
-    loading.value = true;
-  }, SHOW_LOADING_AFTER_MILISECONDS);
-  const clearLoadingTimeout = () => clearTimeout(setLoadingTimeout);
-  signal.addEventListener("abort", clearLoadingTimeout);
-
-  error.value = false;
-
-  fetch("/api/zoeken", {
-    body: JSON.stringify({
+const { error, showSpinner, data } = useLoader((signal) => {
+  if (typeof query.value === "string")
+    return search({
       query: query.value,
-      page: page.value
-    }),
-    method: "POST",
-    headers: {
-      "content-type": "application/json"
-    },
-    signal
-  })
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-    .then((r) => {
-      showResults.value = true;
-      response.value = r;
-    })
-    .catch((reason) => {
-      // if the signal is aborted, fetch throws an Error.
-      // we don't want to disrupt the user's flow for this.
-      if (signal.aborted) {
-        // but we log the reason for debugging purposes
-        console.log(reason);
-      } else {
-        // any other error is unexpected and should disrupt the flow
-        error.value = true;
-      }
-    })
-    .finally(() => {
-      clearLoadingTimeout();
-      loading.value = false;
+      page: page.value,
+      sort: sort.value,
+      signal
     });
 });
+
+const truncate = (s: string, ch: number) => {
+  if (s.length <= ch) return s;
+  return s.substring(0, ch) + "...";
+};
 </script>
+
+<style lang="scss" scoped>
+.search-fieldset {
+  display: flex;
+  align-items: center;
+
+  input {
+    max-inline-size: 100%;
+    inline-size: 20rem;
+  }
+}
+</style>
