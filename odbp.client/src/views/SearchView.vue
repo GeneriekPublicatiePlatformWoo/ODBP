@@ -23,6 +23,7 @@
               autocomplete="off"
               spelcheck="false"
               enterkeyhint="search"
+              @search="submit"
           /></utrecht-form-field>
           <utrecht-button type="submit" :appearance="'primary-action-button'"
             >Zoeken</utrecht-button
