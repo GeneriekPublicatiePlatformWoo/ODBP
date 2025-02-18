@@ -56,6 +56,13 @@ import { useRouteQuery } from "@vueuse/router";
 import { ref, watchEffect } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 
+type SearchResponse = {
+  results: { uuid: string; officieleTitel: string; resultType: "Document" | "Publication" }[];
+  count: number;
+  next: boolean;
+  previous: boolean;
+};
+
 let controller: AbortController | null = null;
 
 const route = useRoute();
@@ -66,7 +73,7 @@ const page = useRouteQuery("page", "1", { transform: Number });
 const zoekVeld = ref<string>(query.value || "");
 const loading = ref(false);
 const error = ref(false);
-const response = ref();
+const response = ref<SearchResponse>();
 
 const showResults = ref(false);
 
@@ -97,9 +104,10 @@ watchEffect(() => {
 
   // only show a spinner if the request takes longer than 200 ms.
   // otherwise, we don't want to disrupt the users's flow
+  const SHOW_LOADING_AFTER_MILISECONDS = 200;
   const setLoadingTimeout = setTimeout(() => {
     loading.value = true;
-  }, 200);
+  }, SHOW_LOADING_AFTER_MILISECONDS);
   const clearLoadingTimeout = () => clearTimeout(setLoadingTimeout);
   signal.addEventListener("abort", clearLoadingTimeout);
 
