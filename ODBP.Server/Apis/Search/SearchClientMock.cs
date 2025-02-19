@@ -134,7 +134,7 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
         };
     }
 
-    private static Action<SortOptionsDescriptor<SearchResult>>[] GetSort(SearchRequest request) => request.Sort == Sort.Chronological
+    private static Action<SortOptionsDescriptor<SearchResult>>[] GetSort(SearchRequest request) => request.Sort == Sort.chronological
             ? [
                 s => s.Field(f => f.LaatstGewijzigdDatum, f => f.Order(SortOrder.Desc)),
                 s =>s.Score(s => s.Order(SortOrder.Desc))
