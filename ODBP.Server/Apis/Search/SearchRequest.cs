@@ -20,7 +20,7 @@ namespace ODBP.Apis.Search
     [JsonConverter(typeof(JsonStringEnumConverter<Sort>))]
     public enum Sort
     {
-        Relevance,
-        Chronological
+        relevance,
+        chronological
     }
 }

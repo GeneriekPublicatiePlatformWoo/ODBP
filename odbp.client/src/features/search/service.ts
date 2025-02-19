@@ -21,8 +21,8 @@ type WaardelijstItem = {
 };
 
 export const sortOptions = {
-  relevance: { label: "Relevantie", value: "Relevance" },
-  chronological: { label: "Chronologisch", value: "Chronological" }
+  relevance: { label: "Relevantie", value: "relevance" },
+  chronological: { label: "Chronologisch", value: "chronological" }
 } as const;
 
 type ValueOf<T> = T[keyof T];
