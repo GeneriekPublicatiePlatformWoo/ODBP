@@ -8,7 +8,7 @@ type SearchResponse = {
 type SearchResponseItem = {
   uuid: string;
   officieleTitel: string;
-  resultType: "Document" | "Publication";
+  resultType: ResultType;
   informatieCategorieen: WaardelijstItem[];
   publisher: WaardelijstItem;
   laatstGewijzigdDatum: string;
@@ -25,8 +25,14 @@ export const sortOptions = {
   chronological: { label: "Chronologisch", value: "chronological" }
 } as const;
 
+export const resultOptions = {
+  publication: { label: "Publicatie", value: "publication" },
+  document: { label: "Document", value: "document" }
+} as const;
+
 type ValueOf<T> = T[keyof T];
 export type Sort = ValueOf<typeof sortOptions>["value"];
+export type ResultType = ValueOf<typeof resultOptions>["value"];
 
 export function search({
   query,

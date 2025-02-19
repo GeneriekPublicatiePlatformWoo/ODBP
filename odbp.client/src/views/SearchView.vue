@@ -46,48 +46,57 @@
           <!-- <utrecht-heading :level="2">Filters</utrecht-heading> -->
         </div>
       </form>
-      <simple-spinner v-if="showSpinner" />
-      <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
-      <div v-else-if="data" class="results">
-        <div v-if="data.results.length">
-          <p>{{ data.count }} gevonden</p>
-          <ol>
-            <li
-              v-for="(
-                {
-                  uuid,
-                  officieleTitel,
-                  resultType,
-                  informatieCategorieen,
-                  publisher,
-                  laatstGewijzigdDatum,
-                  omschrijving
-                },
-                idx
-              ) in data.results"
-              :key="uuid + idx"
-            >
-              <article>
-                <router-link
-                  :to="`/${resultType === 'Document' ? 'documenten' : 'publicaties'}/${uuid}`"
-                >
-                  {{ officieleTitel }}
-                </router-link>
-                <ul>
-                  <li>{{ resultType }}</li>
-                  <li v-for="categorie in informatieCategorieen" :key="categorie.uuid">
-                    {{ categorie.name }}
-                  </li>
-                  <li>{{ publisher.name }}</li>
-                  <li>{{ laatstGewijzigdDatum }}</li>
-                </ul>
-                <p>{{ truncate(omschrijving, 200) }}</p>
-              </article>
-            </li>
-          </ol>
-          <utrecht-pagination v-if="pagination" v-bind="pagination" />
-        </div>
-        <p v-else>Geen resultaten gevonden</p>
+
+      <div class="results">
+        <simple-spinner v-if="showSpinner" />
+        <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
+        <template v-else-if="data">
+          <div v-if="data.results.length">
+            <p class="result-count">{{ data.count }} gevonden</p>
+            <ol>
+              <li
+                v-for="(
+                  {
+                    uuid,
+                    officieleTitel,
+                    resultType,
+                    informatieCategorieen,
+                    publisher,
+                    laatstGewijzigdDatum,
+                    omschrijving
+                  },
+                  idx
+                ) in data.results"
+                :key="uuid + idx"
+              >
+                <article class="search-result">
+                  <utrecht-heading :level="3">
+                    <router-link
+                      :to="`/${resultType === resultOptions.document.value ? 'documenten' : 'publicaties'}/${uuid}`"
+                    >
+                      {{ officieleTitel }}
+                    </router-link>
+                  </utrecht-heading>
+                  <ul>
+                    <li>
+                      <strong>{{ resultOptions[resultType].label }}</strong>
+                    </li>
+                    <li>{{ publisher.name }}</li>
+                    <li v-for="categorie in informatieCategorieen" :key="categorie.uuid">
+                      {{ categorie.name }}
+                    </li>
+                  </ul>
+                  <p>{{ truncate(omschrijving, 150) }}</p>
+                  <time :datetime="laatstGewijzigdDatum">{{
+                    formatDate(laatstGewijzigdDatum)
+                  }}</time>
+                </article>
+              </li>
+            </ol>
+            <utrecht-pagination v-if="pagination" v-bind="pagination" class="pagination" />
+          </div>
+          <p v-else>Geen resultaten gevonden</p>
+        </template>
       </div>
     </div>
   </utrecht-article>
@@ -99,7 +108,8 @@ import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
 import { useLoader } from "@/composables/use-loader";
 import { useSpinner } from "@/composables/use-spinner";
-import { type Sort, sortOptions, search } from "@/features/search/service";
+import { type Sort, sortOptions, search, resultOptions } from "@/features/search/service";
+import { formatDate } from "@/helpers";
 import { mapPaginatedResultsToUtrechtPagination } from "@/helpers/pagination";
 import { useRouteQuery } from "@vueuse/router";
 import { computed, ref, watchEffect } from "vue";
@@ -167,9 +177,9 @@ const truncate = (s: string, ch: number) => {
 <style lang="scss" scoped>
 .zoeken-page {
   display: grid;
-  grid-template-columns: minmax(1) auto;
+  grid-template-columns: 1fr minmax(var(--utrecht-article-max-inline-size), 1fr);
   grid-template-rows: auto 1fr;
-  column-gap: 1rem;
+  column-gap: calc(2 * var(--utrecht-space-inline-md));
 
   form {
     display: grid;
@@ -182,11 +192,13 @@ const truncate = (s: string, ch: number) => {
   .zoeken {
     grid-column: 2 / 2;
     grid-row: 1 / 1;
+    z-index: 1;
   }
 
   .filters {
     grid-column: 1 / 1;
     grid-row: 1 / -1;
+    z-index: 1;
   }
 
   .results {
@@ -199,6 +211,8 @@ const truncate = (s: string, ch: number) => {
     > * {
       grid-column: -1 / -1;
       grid-row: -1 / -1;
+      display: flex;
+      flex-direction: column;
     }
   }
 }
@@ -237,5 +251,36 @@ const truncate = (s: string, ch: number) => {
       var(--utrecht-form-control-padding-inline-end)
     );
   }
+}
+
+ol,
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+article.search-result {
+  ul {
+    display: flex;
+    column-gap: var(--utrecht-space-inline-xs);
+    flex-wrap: wrap;
+  }
+  li,
+  time {
+    font-size: 0.75em;
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.pagination {
+  margin-inline: auto;
+  margin-block-start: var(--utrecht-space-inline-md);
+}
+
+.result-count {
+  margin: 0;
 }
 </style>

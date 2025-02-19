@@ -13,6 +13,8 @@ export function useLoader<T>(fetcher: (signal: AbortSignal) => Promise<T> | unde
         abortController.abort();
       });
 
+      error.value = false;
+
       return fetcher(abortController.signal)?.catch(() => {
         if (!abortController.signal.aborted) {
           error.value = true;

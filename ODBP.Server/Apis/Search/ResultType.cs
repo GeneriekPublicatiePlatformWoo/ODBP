@@ -5,6 +5,6 @@ namespace ODBP.Apis.Search;
 [JsonConverter(typeof(JsonStringEnumConverter<ResultType>))]
 public enum ResultType
 {
-    Publication,
-    Document
+    publication,
+    document
 }

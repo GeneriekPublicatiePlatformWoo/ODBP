@@ -1,2 +1,2 @@
 export const formatDate = (date?: string) =>
-  date && Intl.DateTimeFormat("default", { dateStyle: "long" }).format(Date.parse(date));
+  date && Intl.DateTimeFormat("nl-NL", { dateStyle: "long" }).format(Date.parse(date));
