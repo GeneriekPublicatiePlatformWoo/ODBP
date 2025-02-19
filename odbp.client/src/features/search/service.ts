@@ -3,6 +3,8 @@ type SearchResponse = {
   count: number;
   next: boolean;
   previous: boolean;
+  registratiedatumVanaf?: string;
+  registratiedatumTot?: string;
 };
 
 type SearchResponseItem = {
@@ -35,22 +37,18 @@ export type Sort = ValueOf<typeof sortOptions>["value"];
 export type ResultType = ValueOf<typeof resultOptions>["value"];
 
 export function search({
-  query,
-  page,
-  sort,
-  signal
+  signal,
+  ...body
 }: {
   query: string;
   page: number;
   sort: Sort;
+  registratieDatumVanaf?: string;
+  registratieDatumTot?: string;
   signal?: AbortSignal;
 }): Promise<SearchResponse> {
   return fetch("/api/zoeken", {
-    body: JSON.stringify({
-      query: query,
-      page: page,
-      sort: sort
-    }),
+    body: JSON.stringify(body),
     method: "POST",
     headers: {
       "content-type": "application/json"

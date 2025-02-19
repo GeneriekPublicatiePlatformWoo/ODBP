@@ -3,7 +3,7 @@
     <utrecht-heading :level="1">Zoeken</utrecht-heading>
 
     <div class="zoeken-page">
-      <form class="utrecht-form" @submit.prevent="submit">
+      <form class="utrecht-form" @submit.prevent.stop="submit">
         <utrecht-fieldset class="zoeken">
           <utrecht-form-field
             ><utrecht-form-label
@@ -30,13 +30,37 @@
             ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
               >Sorteren</utrecht-form-label
             >
-            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+            <utrecht-select
+              id="sort-select"
+              v-model="sortValue"
+              :options="Object.values(sortOptions)"
+            />
             <gpp-woo-icon icon="sort" />
           </utrecht-form-field>
         </utrecht-fieldset>
-        <!-- <utrecht-fieldset class="filters">
-          <utrecht-legend>Filters</utrecht-legend>
-        </utrecht-fieldset> -->
+        <utrecht-fieldset class="filters">
+          <!-- <utrecht-legend>Filters</utrecht-legend> -->
+          <utrecht-form-field
+            ><utrecht-form-label for="registration-date-from"
+              >Registratiedatum vanaf</utrecht-form-label
+            >
+            <utrecht-textbox
+              id="registration-date-from"
+              v-model="registratiedatumVanafValue"
+              type="date"
+            />
+          </utrecht-form-field>
+          <utrecht-form-field
+            ><utrecht-form-label for="registration-date-until"
+              >Registratiedatum tot en met</utrecht-form-label
+            >
+            <utrecht-textbox
+              id="registration-date-until"
+              v-model="registratiedatumTotValue"
+              type="date"
+            />
+          </utrecht-form-field>
+        </utrecht-fieldset>
       </form>
 
       <div class="results">
@@ -111,27 +135,37 @@ const route = useRoute();
 
 const first = <T,>(v: T | T[]) => (Array.isArray(v) ? v[0] : v);
 
-const query = useRouteQuery("query", "", {
-  transform: (v) => first(v) || ""
-});
+const query = useRouteQuery("query");
 
-const page = useRouteQuery("page", 1, {
-  transform: (v) => +(first(v) || "1")
-});
+const page = useRouteQuery("page");
 
-const sort = useRouteQuery<Sort>("sort", sortOptions.relevance.value, {
-  transform: (v) =>
-    first(v) === sortOptions.chronological.value
+const sort = useRouteQuery("sort");
+const sortValue = computed({
+  get: () =>
+    first(sort.value) === sortOptions.chronological.value
       ? sortOptions.chronological.value
-      : sortOptions.relevance.value
+      : sortOptions.relevance.value,
+  set: (v) => (sort.value = v)
+});
+
+const registratiedatumVanaf = useRouteQuery("registratiedatumVanaf");
+const registratiedatumVanafValue = computed({
+  get: () => first(registratiedatumVanaf.value) ?? "",
+  set: (v) => (registratiedatumVanaf.value = v)
+});
+
+const registratiedatumTot = useRouteQuery("registratiedatumTot");
+const registratiedatumTotValue = computed({
+  get: () => first(registratiedatumTot.value) ?? "",
+  set: (v) => (registratiedatumTot.value = v)
 });
 
 const zoekVeld = ref("");
 
-watchEffect(() => (zoekVeld.value = query.value || ""));
+watchEffect(() => (zoekVeld.value = first(query.value) || ""));
 
 const submit = () => {
-  page.value = 1;
+  page.value = "1";
   query.value = zoekVeld.value;
 };
 
@@ -145,9 +179,11 @@ const getRoute = (page: number): RouteLocationRaw => ({
 
 const { error, loading, data } = useLoader((signal) =>
   search({
-    query: query.value,
-    page: page.value,
-    sort: sort.value,
+    query: first(query.value) || "",
+    page: +(first(page.value) || "1"),
+    sort: sortValue.value,
+    registratieDatumVanaf: first(registratiedatumVanaf.value) || undefined,
+    registratieDatumTot: first(registratiedatumTot.value) || undefined,
     signal
   })
 );
@@ -157,19 +193,27 @@ const showSpinner = useSpinner(loading);
 const pagination = computed(
   () =>
     data.value &&
-    mapPaginatedResultsToUtrechtPagination({ page: page.value, pagination: data.value, getRoute })
+    mapPaginatedResultsToUtrechtPagination({
+      page: +(first(page.value) || "1"),
+      pagination: data.value,
+      getRoute
+    })
 );
 
 const truncate = (s: string, ch: number) => {
   if (s.length <= ch) return s;
   return s.substring(0, ch) + "...";
 };
+
+const onSearchEvent = () => {
+  !zoekVeld.value && submit();
+};
 </script>
 
 <style lang="scss" scoped>
 .zoeken-page {
   display: grid;
-  grid-template-columns: 1fr minmax(var(--utrecht-article-max-inline-size), 1fr);
+  grid-template-columns: minmax(14rem, 1fr) minmax(var(--utrecht-article-max-inline-size), 1fr);
   grid-template-rows: auto 1fr;
   column-gap: calc(2 * var(--utrecht-space-inline-md));
 

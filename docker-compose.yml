@@ -8,6 +8,7 @@ services:
       - ELASTICSEARCH_BASE_URL=http://es:9200
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=insecure-elastic
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
     ports:
       - "53997:8080"
     depends_on:
