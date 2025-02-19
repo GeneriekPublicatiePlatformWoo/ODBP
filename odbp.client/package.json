@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@vueuse/core": "^12.5.0",
-    "@vueuse/router": "^12.7.0",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"
   },

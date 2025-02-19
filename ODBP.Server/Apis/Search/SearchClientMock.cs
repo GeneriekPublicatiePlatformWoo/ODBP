@@ -151,7 +151,7 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
             yield return f => f.MultiMatch(s => s
                 .Fields(s_fields)
                 .Query(request.Query)
-                .Fuzziness(new(2)));
+                .Fuzziness(new(1)));
         }
     }
 

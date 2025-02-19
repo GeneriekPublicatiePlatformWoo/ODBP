@@ -43,8 +43,8 @@ export function search({
   query: string;
   page: number;
   sort: Sort;
-  registratieDatumVanaf?: string;
-  registratieDatumTot?: string;
+  registratiedatumVanaf?: string;
+  registratiedatumTot?: string;
   signal?: AbortSignal;
 }): Promise<SearchResponse> {
   return fetch("/api/zoeken", {

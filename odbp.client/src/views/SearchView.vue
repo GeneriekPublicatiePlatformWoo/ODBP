@@ -30,11 +30,7 @@
             ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
               >Sorteren</utrecht-form-label
             >
-            <utrecht-select
-              id="sort-select"
-              v-model="sortValue"
-              :options="Object.values(sortOptions)"
-            />
+            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
             <gpp-woo-icon icon="sort" />
           </utrecht-form-field>
         </utrecht-fieldset>
@@ -46,7 +42,7 @@
             >
             <utrecht-textbox
               id="registration-date-from"
-              v-model="registratiedatumVanafValue"
+              v-model="registratiedatumVanaf"
               type="date"
             />
           </utrecht-form-field>
@@ -56,7 +52,7 @@
             >
             <utrecht-textbox
               id="registration-date-until"
-              v-model="registratiedatumTotValue"
+              v-model="registratiedatumTot"
               type="date"
             />
           </utrecht-form-field>
@@ -123,49 +119,34 @@ import GppWooIcon from "@/components/GppWooIcon.vue";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
 import { useLoader } from "@/composables/use-loader";
+import { useRouterQuerySingle } from "@/composables/use-router-query";
 import { useSpinner } from "@/composables/use-spinner";
-import { type Sort, sortOptions, search, resultOptions } from "@/features/search/service";
+import { sortOptions, search, resultOptions } from "@/features/search/service";
 import { formatDate } from "@/helpers";
 import { mapPaginatedResultsToUtrechtPagination } from "@/helpers/pagination";
-import { useRouteQuery } from "@vueuse/router";
 import { computed, ref, watchEffect } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 
 const route = useRoute();
 
-const first = <T,>(v: T | T[]) => (Array.isArray(v) ? v[0] : v);
+const query = useRouterQuerySingle("query", (x) => x || "");
+const page = useRouterQuerySingle("page", (x) => +(x || "1"));
+const sort = useRouterQuerySingle("sort", (x) =>
+  x === sortOptions.chronological.value
+    ? sortOptions.chronological.value
+    : sortOptions.relevance.value
+);
 
-const query = useRouteQuery("query");
+const registratiedatumVanaf = useRouterQuerySingle("registratiedatumVanaf", (x) => x || "");
 
-const page = useRouteQuery("page");
-
-const sort = useRouteQuery("sort");
-const sortValue = computed({
-  get: () =>
-    first(sort.value) === sortOptions.chronological.value
-      ? sortOptions.chronological.value
-      : sortOptions.relevance.value,
-  set: (v) => (sort.value = v)
-});
-
-const registratiedatumVanaf = useRouteQuery("registratiedatumVanaf");
-const registratiedatumVanafValue = computed({
-  get: () => first(registratiedatumVanaf.value) ?? "",
-  set: (v) => (registratiedatumVanaf.value = v)
-});
-
-const registratiedatumTot = useRouteQuery("registratiedatumTot");
-const registratiedatumTotValue = computed({
-  get: () => first(registratiedatumTot.value) ?? "",
-  set: (v) => (registratiedatumTot.value = v)
-});
+const registratiedatumTot = useRouterQuerySingle("registratiedatumTot", (x) => x || "");
 
 const zoekVeld = ref("");
 
-watchEffect(() => (zoekVeld.value = first(query.value) || ""));
+watchEffect(() => (zoekVeld.value = query.value));
 
 const submit = () => {
-  page.value = "1";
+  page.value = 1;
   query.value = zoekVeld.value;
 };
 
@@ -179,11 +160,11 @@ const getRoute = (page: number): RouteLocationRaw => ({
 
 const { error, loading, data } = useLoader((signal) =>
   search({
-    query: first(query.value) || "",
-    page: +(first(page.value) || "1"),
-    sort: sortValue.value,
-    registratieDatumVanaf: first(registratiedatumVanaf.value) || undefined,
-    registratieDatumTot: first(registratiedatumTot.value) || undefined,
+    query: query.value,
+    page: page.value,
+    sort: sort.value,
+    registratiedatumVanaf: registratiedatumVanaf.value || undefined,
+    registratiedatumTot: registratiedatumTot.value || undefined,
     signal
   })
 );
@@ -194,7 +175,7 @@ const pagination = computed(
   () =>
     data.value &&
     mapPaginatedResultsToUtrechtPagination({
-      page: +(first(page.value) || "1"),
+      page: page.value,
       pagination: data.value,
       getRoute
     })
@@ -203,10 +184,6 @@ const pagination = computed(
 const truncate = (s: string, ch: number) => {
   if (s.length <= ch) return s;
   return s.substring(0, ch) + "...";
-};
-
-const onSearchEvent = () => {
-  !zoekVeld.value && submit();
 };
 </script>
 
@@ -235,6 +212,11 @@ const onSearchEvent = () => {
     grid-column: 1 / 1;
     grid-row: 1 / -1;
     z-index: 1;
+
+    > :first-child {
+      display: grid;
+      gap: 0.5rem;
+    }
   }
 
   .results {
