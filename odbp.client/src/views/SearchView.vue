@@ -2,9 +2,9 @@
   <utrecht-article>
     <utrecht-heading :level="1">Zoeken</utrecht-heading>
 
-    <form class="utrecht-form">
-      <div class="utrecht-form-fieldset">
-        <fieldset class="utrecht-form-fieldset__fieldset utrecht-form-fieldset--html-fieldset">
+    <div class="zoeken-page">
+      <form class="utrecht-form" @submit.prevent="submit">
+        <utrecht-fieldset class="zoeken">
           <utrecht-form-field
             ><utrecht-form-label
               for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
@@ -16,16 +16,263 @@
               id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
               aria-placeholder="Hier zoeken"
               placeholder="Hier zoeken"
-              v-model="zoekTerm"
+              v-model="zoekVeld"
+              type="search"
+              autocomplete="off"
+              spelcheck="false"
+              enterkeyhint="search"
+              @search="submit"
           /></utrecht-form-field>
-        </fieldset>
+          <utrecht-button type="submit" :appearance="'primary-action-button'"
+            >Zoeken</utrecht-button
+          >
+          <utrecht-form-field
+            ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
+              >Sorteren</utrecht-form-label
+            >
+            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+            <gpp-woo-icon icon="sort" />
+          </utrecht-form-field>
+        </utrecht-fieldset>
+        <!-- <utrecht-fieldset class="filters">
+          <utrecht-legend>Filters</utrecht-legend>
+        </utrecht-fieldset> -->
+      </form>
+
+      <div class="results">
+        <simple-spinner v-if="showSpinner" />
+        <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
+        <template v-else-if="data">
+          <div v-if="data.results.length">
+            <p class="result-count">{{ data.count }} gevonden</p>
+            <ol>
+              <li
+                v-for="(
+                  {
+                    uuid,
+                    officieleTitel,
+                    resultType,
+                    informatieCategorieen,
+                    publisher,
+                    laatstGewijzigdDatum,
+                    omschrijving
+                  },
+                  idx
+                ) in data.results"
+                :key="uuid + idx"
+              >
+                <article class="search-result">
+                  <utrecht-heading :level="3">
+                    <router-link
+                      :to="`/${resultType === resultOptions.document.value ? 'documenten' : 'publicaties'}/${uuid}`"
+                    >
+                      {{ officieleTitel }}
+                    </router-link>
+                  </utrecht-heading>
+                  <ul>
+                    <li>
+                      <strong>{{ resultOptions[resultType].label }}</strong>
+                    </li>
+                    <li>{{ publisher.name }}</li>
+                    <li v-for="categorie in informatieCategorieen" :key="categorie.uuid">
+                      {{ categorie.name }}
+                    </li>
+                  </ul>
+                  <p>{{ truncate(omschrijving, 150) }}</p>
+                  <time :datetime="laatstGewijzigdDatum">{{
+                    formatDate(laatstGewijzigdDatum)
+                  }}</time>
+                </article>
+              </li>
+            </ol>
+            <utrecht-pagination v-if="pagination" v-bind="pagination" class="pagination" />
+          </div>
+          <p v-else>Geen resultaten gevonden</p>
+        </template>
       </div>
-    </form>
+    </div>
   </utrecht-article>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import GppWooIcon from "@/components/GppWooIcon.vue";
+import SimpleSpinner from "@/components/SimpleSpinner.vue";
+import UtrechtPagination from "@/components/UtrechtPagination.vue";
+import { useLoader } from "@/composables/use-loader";
+import { useSpinner } from "@/composables/use-spinner";
+import { type Sort, sortOptions, search, resultOptions } from "@/features/search/service";
+import { formatDate } from "@/helpers";
+import { mapPaginatedResultsToUtrechtPagination } from "@/helpers/pagination";
+import { useRouteQuery } from "@vueuse/router";
+import { computed, ref, watchEffect } from "vue";
+import { useRoute, type RouteLocationRaw } from "vue-router";
 
-const zoekTerm = ref<string>("");
+const route = useRoute();
+
+const first = <T,>(v: T | T[]) => (Array.isArray(v) ? v[0] : v);
+
+const query = useRouteQuery("query", "", {
+  transform: (v) => first(v) || ""
+});
+
+const page = useRouteQuery("page", 1, {
+  transform: (v) => +(first(v) || "1")
+});
+
+const sort = useRouteQuery<Sort>("sort", sortOptions.relevance.value, {
+  transform: (v) =>
+    first(v) === sortOptions.chronological.value
+      ? sortOptions.chronological.value
+      : sortOptions.relevance.value
+});
+
+const zoekVeld = ref("");
+
+watchEffect(() => (zoekVeld.value = query.value || ""));
+
+const submit = () => {
+  page.value = 1;
+  query.value = zoekVeld.value;
+};
+
+const getRoute = (page: number): RouteLocationRaw => ({
+  path: route.path,
+  query: {
+    ...route.query,
+    page: page.toString()
+  }
+});
+
+const { error, loading, data } = useLoader((signal) =>
+  search({
+    query: query.value,
+    page: page.value,
+    sort: sort.value,
+    signal
+  })
+);
+
+const showSpinner = useSpinner(loading);
+
+const pagination = computed(
+  () =>
+    data.value &&
+    mapPaginatedResultsToUtrechtPagination({ page: page.value, pagination: data.value, getRoute })
+);
+
+const truncate = (s: string, ch: number) => {
+  if (s.length <= ch) return s;
+  return s.substring(0, ch) + "...";
+};
 </script>
+
+<style lang="scss" scoped>
+.zoeken-page {
+  display: grid;
+  grid-template-columns: 1fr minmax(var(--utrecht-article-max-inline-size), 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: calc(2 * var(--utrecht-space-inline-md));
+
+  form {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+
+  .zoeken {
+    grid-column: 2 / 2;
+    grid-row: 1 / 1;
+    z-index: 1;
+  }
+
+  .filters {
+    grid-column: 1 / 1;
+    grid-row: 1 / -1;
+    z-index: 1;
+  }
+
+  .results {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+
+    > * {
+      grid-column: -1 / -1;
+      grid-row: -1 / -1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+.zoeken > :first-child {
+  --_gap: calc(var(--utrecht-space-inline-md) * 2);
+  gap: var(--_gap);
+  display: flex;
+  align-items: center;
+
+  button {
+    margin-inline-start: calc(-2 * var(--utrecht-space-inline-md));
+  }
+
+  input {
+    max-inline-size: 100%;
+    inline-size: 20rem;
+  }
+}
+
+:has(> #sort-select) {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-inline-size: 16ch;
+  align-items: center;
+  > * {
+    grid-column: 1 / 1;
+    grid-row: 1 / 1;
+  }
+  > :last-child {
+    justify-self: end;
+    inline-size: 0.5rem;
+    display: flex;
+    padding-inline-end: var(
+      --utrecht-select-padding-inline-end,
+      var(--utrecht-form-control-padding-inline-end)
+    );
+  }
+}
+
+ol,
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+article.search-result {
+  ul {
+    display: flex;
+    column-gap: var(--utrecht-space-inline-xs);
+    flex-wrap: wrap;
+  }
+  li,
+  time {
+    font-size: 0.75em;
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.pagination {
+  margin-inline: auto;
+  margin-block-start: var(--utrecht-space-inline-md);
+}
+
+.result-count {
+  margin: 0;
+}
+</style>

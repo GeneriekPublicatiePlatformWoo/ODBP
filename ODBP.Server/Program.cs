@@ -1,4 +1,7 @@
-﻿using ODBP.Apis.Odrc;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
+using ODBP.Apis.Odrc;
+using ODBP.Apis.Search;
 using ODBP.Config;
 using ODBP.Features;
 using ODBP.Features.Sitemap;
@@ -34,19 +37,20 @@ try
     // als de cache dan pas de volgende dag om 01:01 verloopt, krijgt de crawler de volgende dag de gecachete waarde.
     // daarom maar een uurtje minder lang cachen
     const int DefaultCacheExpiryHours = 23;
-    
-    var cacheExpiryHours = double.TryParse(builder.Configuration["SITEMAP_CACHE_DURATION_HOURS"], out var d) 
-        ? d 
+
+    var cacheExpiryHours = double.TryParse(builder.Configuration["SITEMAP_CACHE_DURATION_HOURS"], out var d)
+        ? d
         : DefaultCacheExpiryHours;
 
-    builder.Services.AddOutputCache(x=> x.AddPolicy(OutputCachePolicies.Sitemap, 
-        b=> b.Expire(TimeSpan.FromHours(cacheExpiryHours))));
+    builder.Services.AddOutputCache(x => x.AddPolicy(OutputCachePolicies.Sitemap,
+        b => b.Expire(TimeSpan.FromHours(cacheExpiryHours))));
 
     builder.Services.AddSingleton<ResourcesConfig>();
+    SearchClientMock.AddToServices(builder.Services, builder.Configuration);
 
     var app = builder.Build();
 
-    app.UseSerilogRequestLogging(x=> x.Logger = logger);
+    app.UseSerilogRequestLogging(x => x.Logger = logger);
     app.UseDefaultFiles();
     app.UseOdbpStaticFiles();
 
@@ -61,6 +65,11 @@ try
     app.MapHealthChecks("/healthz");
     app.MapFallbackToIndexHtml();
 
+    if (app.Environment.IsDevelopment())
+    {
+        await SearchClientMock.Seed(app);
+    }
+    
     app.Run();
 }
 catch (Exception ex) when (ex is not HostAbortedException)

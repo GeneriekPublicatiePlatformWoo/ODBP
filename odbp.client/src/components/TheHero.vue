@@ -16,7 +16,7 @@
             {{ naam }}</span
           >
 
-          <utrecht-paragraph>
+          <utrecht-paragraph v-if="route.name === 'home'">
             <router-link
               :to="{ name: 'zoeken' }"
               class="utrecht-button-link utrecht-button-link--html-a utrecht-button-link--primary-action"
@@ -32,9 +32,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { injectResources } from "@/resources";
+import { useRoute } from "vue-router";
 
 const resources = injectResources();
 const naam = computed(() => (resources?.name ? resources.name : "-"));
+const route = useRoute();
 </script>
 
 <style lang="scss" scoped>
