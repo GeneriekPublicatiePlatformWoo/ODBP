@@ -4,47 +4,39 @@
 
     <div class="zoeken-page">
       <form class="utrecht-form" @submit.prevent="submit">
-        <div class="utrecht-form-fieldset zoeken">
-          <fieldset
-            class="utrecht-form-fieldset__fieldset utrecht-form-fieldset--html-fieldset search-fieldset"
-          >
-            <utrecht-form-field
-              ><utrecht-form-label
-                for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
-                aria-hidden="true"
-                hidden
-                >Zoekterm</utrecht-form-label
-              >
-              <utrecht-textbox
-                id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
-                aria-placeholder="Hier zoeken"
-                placeholder="Hier zoeken"
-                v-model="zoekVeld"
-                type="search"
-                autocomplete="off"
-                spelcheck="false"
-                enterkeyhint="search"
-                @search="submit"
-            /></utrecht-form-field>
-            <utrecht-button type="submit" :appearance="'primary-action-button'"
-              >Zoeken</utrecht-button
+        <utrecht-fieldset class="zoeken">
+          <utrecht-form-field
+            ><utrecht-form-label
+              for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
+              aria-hidden="true"
+              hidden
+              >Zoekterm</utrecht-form-label
             >
-            <utrecht-form-field
-              ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
-                >Sorteren</utrecht-form-label
-              >
-              <utrecht-select
-                id="sort-select"
-                v-model="sort"
-                :options="Object.values(sortOptions)"
-              />
-              <gpp-woo-icon icon="sort" />
-            </utrecht-form-field>
-          </fieldset>
-        </div>
-        <div class="utrecht-form-fieldset filters">
-          <!-- <utrecht-heading :level="2">Filters</utrecht-heading> -->
-        </div>
+            <utrecht-textbox
+              id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
+              aria-placeholder="Hier zoeken"
+              placeholder="Hier zoeken"
+              v-model="zoekVeld"
+              type="search"
+              autocomplete="off"
+              spelcheck="false"
+              enterkeyhint="search"
+              @search="submit"
+          /></utrecht-form-field>
+          <utrecht-button type="submit" :appearance="'primary-action-button'"
+            >Zoeken</utrecht-button
+          >
+          <utrecht-form-field
+            ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
+              >Sorteren</utrecht-form-label
+            >
+            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+            <gpp-woo-icon icon="sort" />
+          </utrecht-form-field>
+        </utrecht-fieldset>
+        <!-- <utrecht-fieldset class="filters">
+          <utrecht-legend>Filters</utrecht-legend>
+        </utrecht-fieldset> -->
       </form>
 
       <div class="results">
@@ -217,7 +209,7 @@ const truncate = (s: string, ch: number) => {
   }
 }
 
-.search-fieldset {
+.zoeken > :first-child {
   --_gap: calc(var(--utrecht-space-inline-md) * 2);
   gap: var(--_gap);
   display: flex;

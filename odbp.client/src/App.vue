@@ -2,7 +2,7 @@
   <the-header />
 
   <main id="main">
-    <the-hero v-if="route.name === 'home'" />
+    <the-hero />
 
     <section class="utrecht-page utrecht-page-content">
       <router-view />
@@ -13,10 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView, useRoute } from "vue-router";
+import { RouterView } from "vue-router";
 import TheHeader from "./components/TheHeader.vue";
 import TheHero from "./components/TheHero.vue";
 import TheFooter from "./components/TheFooter.vue";
-
-const route = useRoute();
 </script>

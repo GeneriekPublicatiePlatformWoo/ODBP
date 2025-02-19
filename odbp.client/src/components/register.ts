@@ -22,7 +22,9 @@ import {
   TableRow as UtrechtTableRow,
   TableCell as UtrechtTableCell,
   TableHeaderCell as UtrechtTableHeaderCell,
-  Select as UtrechtSelect
+  Select as UtrechtSelect,
+  FormFieldset as UtrechtFieldset,
+  FormFieldsetLegend as UtrechtLegend
 } from "@utrecht/component-library-vue";
 
 const components = {
@@ -47,7 +49,9 @@ const components = {
   UtrechtTableRow,
   UtrechtTableCell,
   UtrechtTableHeaderCell,
-  UtrechtSelect
+  UtrechtSelect,
+  UtrechtFieldset,
+  UtrechtLegend
 } as const;
 
 export type OurComponents = typeof components;
