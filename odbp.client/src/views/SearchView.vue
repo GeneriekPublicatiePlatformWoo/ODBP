@@ -1,39 +1,40 @@
 <template>
-  <utrecht-heading :level="1">Zoeken</utrecht-heading>
-
   <div class="zoeken-page">
+    <utrecht-heading :level="1">Zoeken</utrecht-heading>
     <form class="utrecht-form" @submit.prevent.stop="submit">
       <utrecht-fieldset class="zoeken">
-        <utrecht-form-field class="search-bar"
-          ><utrecht-form-label for="92eb76ee-c52f-4dc2-b3db-257ab2cba897" aria-hidden="true" hidden
+        <utrecht-form-field
+          ><utrecht-form-label for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
             >Zoekterm</utrecht-form-label
           >
-          <utrecht-textbox
-            id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
-            aria-placeholder="Hier zoeken"
-            placeholder="Hier zoeken"
-            v-model="zoekVeld"
-            type="search"
-            autocomplete="off"
-            spelcheck="false"
-            enterkeyhint="search"
-            @search="submit"
-          />
-          <utrecht-button type="submit" :appearance="'primary-action-button'"
-            >Zoeken</utrecht-button
-          >
+          <div class="search-bar">
+            <utrecht-textbox
+              id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
+              aria-placeholder="Hier zoeken"
+              placeholder="Hier zoeken"
+              v-model="zoekVeld"
+              type="search"
+              autocomplete="off"
+              spelcheck="false"
+              enterkeyhint="search"
+              @search="submit"
+            />
+            <utrecht-button type="submit" :appearance="'primary-action-button'"
+              >Zoeken</utrecht-button
+            >
+          </div>
         </utrecht-form-field>
 
         <utrecht-form-field
-          ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
-            >Sorteren</utrecht-form-label
-          >
-          <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
-          <gpp-woo-icon icon="sort" />
+          ><utrecht-form-label for="sort-select">Sorteren</utrecht-form-label>
+          <div>
+            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+            <gpp-woo-icon icon="sort" />
+          </div>
         </utrecht-form-field>
       </utrecht-fieldset>
       <utrecht-fieldset class="filters">
-        <!-- <utrecht-legend>Filters</utrecht-legend> -->
+        <utrecht-legend class="visually-hidden">Filters</utrecht-legend>
         <utrecht-form-field
           ><utrecht-form-label for="registration-date-from"
             >Registratiedatum vanaf</utrecht-form-label
@@ -186,8 +187,14 @@ const truncate = (s: string, ch: number) => {
 .zoeken-page {
   display: grid;
   grid-template-columns: minmax(auto, 14rem) 1fr;
-  grid-template-rows: auto 1fr;
-  column-gap: calc(2 * var(--utrecht-space-inline-md));
+  grid-template-rows: auto auto 1fr;
+  column-gap: clamp(var(--utrecht-space-inline-md), 3vw, var(--utrecht-space-inline-4xl));
+
+  > .utrecht-heading-1 {
+    grid-row: 1 / 1;
+    grid-column: 2 / 2;
+    z-index: 1;
+  }
 
   form {
     display: grid;
@@ -199,13 +206,13 @@ const truncate = (s: string, ch: number) => {
 
   .zoeken {
     grid-column: 2 / 2;
-    grid-row: 1 / 1;
+    grid-row: 2 / 2;
     z-index: 1;
   }
 
   .filters {
     grid-column: 1 / 1;
-    grid-row: 1 / -1;
+    grid-row: 2 / -1;
     z-index: 1;
 
     > :first-child {
@@ -233,9 +240,8 @@ const truncate = (s: string, ch: number) => {
 .zoeken > :first-child {
   column-gap: calc(var(--utrecht-space-inline-md) * 2);
   display: flex;
-  align-items: center;
+  align-items: end;
   flex-wrap: wrap;
-  justify-content: space-between;
 
   input {
     max-inline-size: 100%;
@@ -249,22 +255,20 @@ const truncate = (s: string, ch: number) => {
 }
 
 :has(> #sort-select) {
-  display: grid;
-  grid-template-columns: 1fr;
   min-inline-size: 16ch;
-  align-items: center;
-  > * {
-    grid-column: 1 / 1;
-    grid-row: 1 / 1;
-  }
+  position: relative;
+
   > :last-child {
-    justify-self: end;
+    position: absolute;
+    inset-inline-end: 0;
+    block-size: 100%;
     inline-size: 0.5rem;
     display: flex;
     padding-inline-end: var(
       --utrecht-select-padding-inline-end,
       var(--utrecht-form-control-padding-inline-end)
     );
+    pointer-events: none;
   }
 }
 
