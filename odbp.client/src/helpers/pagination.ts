@@ -44,7 +44,7 @@ export function mapPaginatedResultsToUtrechtPagination<T>({
   let upper = lower;
 
   // thats why we want to calculate the minimum and maximum page here
-  while (upper - lower < maxDynamicCount - 1 && (lower > 2 || totalPages > upper)) {
+  while (upper - lower < maxDynamicCount - 1 && (lower > 2 || totalPages - 1 > upper)) {
     lower = Math.max(2, lower - 1);
     upper = Math.min(totalPages - 1, upper + 1);
   }
@@ -53,10 +53,14 @@ export function mapPaginatedResultsToUtrechtPagination<T>({
 
   for (let index = 0; index <= upper - lower; index++) {
     const number = index + lower;
-    links.push(getLink(number));
+    if (number > 1 && number < totalPages) {
+      links.push(getLink(number));
+    }
   }
 
-  links.push(getLink(totalPages));
+  if (totalPages > 1) {
+    links.push(getLink(totalPages));
+  }
 
   return {
     links,

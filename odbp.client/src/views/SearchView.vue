@@ -12,7 +12,7 @@
               id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
               aria-placeholder="Hier zoeken"
               placeholder="Hier zoeken"
-              v-model="zoekVeld"
+              v-model="formFields.query"
               type="search"
               autocomplete="off"
               spelcheck="false"
@@ -28,7 +28,11 @@
         <utrecht-form-field
           ><utrecht-form-label for="sort-select">Sorteren</utrecht-form-label>
           <div>
-            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+            <utrecht-select
+              id="sort-select"
+              v-model="queryParams.sort"
+              :options="Object.values(sortOptions)"
+            />
             <gpp-woo-icon icon="sort" />
           </div>
         </utrecht-form-field>
@@ -41,7 +45,7 @@
           >
           <utrecht-textbox
             id="registration-date-from"
-            v-model="registratiedatumVanaf"
+            v-model="formFields.registratiedatumVanaf"
             type="date"
           />
         </utrecht-form-field>
@@ -49,7 +53,29 @@
           ><utrecht-form-label for="registration-date-until"
             >Registratiedatum tot en met</utrecht-form-label
           >
-          <utrecht-textbox id="registration-date-until" v-model="registratiedatumTot" type="date" />
+          <utrecht-textbox
+            id="registration-date-until"
+            v-model="formFields.registratiedatumTot"
+            type="date"
+          />
+        </utrecht-form-field>
+        <utrecht-form-field
+          ><utrecht-form-label for="update-date-from">Wijzigingsdatum vanaf</utrecht-form-label>
+          <utrecht-textbox
+            id="updated-date-from"
+            v-model="formFields.laatstGewijzigdDatumVanaf"
+            type="date"
+          />
+        </utrecht-form-field>
+        <utrecht-form-field
+          ><utrecht-form-label for="updated-date-until"
+            >Wijzigingsdatum tot en met</utrecht-form-label
+          >
+          <utrecht-textbox
+            id="updated-date-until"
+            v-model="formFields.laatstGewijzigdDatumTot"
+            type="date"
+          />
         </utrecht-form-field>
       </utrecht-fieldset>
     </form>
@@ -69,6 +95,7 @@
                   resultType,
                   informatieCategorieen,
                   publisher,
+                  registratiedatum,
                   laatstGewijzigdDatum,
                   omschrijving
                 },
@@ -98,7 +125,19 @@
                   </li>
                 </ul>
                 <utrecht-paragraph>{{ truncate(omschrijving, 150) }}</utrecht-paragraph>
-                <time :datetime="laatstGewijzigdDatum">{{ formatDate(laatstGewijzigdDatum) }}</time>
+
+                <p>
+                  <time :datetime="registratiedatum">{{ formatDate(registratiedatum) }}</time>
+                  <template
+                    v-if="
+                      laatstGewijzigdDatum?.substring(0, 10) !== registratiedatum?.substring(0, 10)
+                    "
+                    ><span>{{ ", gewijzigd op " }}</span
+                    ><time :datetime="laatstGewijzigdDatum">{{
+                      formatDate(laatstGewijzigdDatum)
+                    }}</time>
+                  </template>
+                </p>
               </utrecht-article>
             </li>
           </ol>
@@ -115,35 +154,54 @@ import GppWooIcon from "@/components/GppWooIcon.vue";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
 import { useLoader } from "@/composables/use-loader";
-import { useRouterQuerySingle } from "@/composables/use-router-query";
+import { useSingleQueryValues } from "@/composables/use-router-query";
 import { useSpinner } from "@/composables/use-spinner";
 import { sortOptions, search, resultOptions } from "@/features/search/service";
 import { formatDate } from "@/helpers";
 import { mapPaginatedResultsToUtrechtPagination } from "@/helpers/pagination";
-import { computed, ref, watchEffect } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 
 const route = useRoute();
 
-const query = useRouterQuerySingle("query", (x) => x || "");
-const page = useRouterQuerySingle("page", (x) => +(x || "1"));
-const sort = useRouterQuerySingle("sort", (x) =>
-  x === sortOptions.chronological.value
-    ? sortOptions.chronological.value
-    : sortOptions.relevance.value
-);
+const unmapped = <T,>(v: T) => v;
 
-const registratiedatumVanaf = useRouterQuerySingle("registratiedatumVanaf", (x) => x || "");
+const queryParams = useSingleQueryValues({
+  query: unmapped,
+  registratiedatumVanaf: unmapped,
+  registratiedatumTot: unmapped,
+  laatstGewijzigdDatumVanaf: unmapped,
+  laatstGewijzigdDatumTot: unmapped,
+  sort: (x) =>
+    x === sortOptions.chronological.value
+      ? sortOptions.chronological.value
+      : sortOptions.relevance.value,
+  page: {
+    get: (x) => +(x || "1"),
+    set: (x) => (x as number).toString()
+  }
+});
 
-const registratiedatumTot = useRouterQuerySingle("registratiedatumTot", (x) => x || "");
+const formFields = reactive({
+  query: "",
+  registratiedatumVanaf: "",
+  registratiedatumTot: "",
+  laatstGewijzigdDatumVanaf: "",
+  laatstGewijzigdDatumTot: ""
+});
 
-const zoekVeld = ref("");
+type FormKeys = keyof typeof formFields;
 
-watchEffect(() => (zoekVeld.value = query.value));
+onMounted(() => {
+  const keys = Object.keys(formFields) as FormKeys[];
+  keys.forEach((key) => (formFields[key] = queryParams[key]));
+});
 
 const submit = () => {
-  page.value = 1;
-  query.value = zoekVeld.value;
+  Object.assign(queryParams, {
+    ...formFields,
+    page: 1
+  });
 };
 
 const getRoute = (page: number): RouteLocationRaw => ({
@@ -156,11 +214,7 @@ const getRoute = (page: number): RouteLocationRaw => ({
 
 const { error, loading, data } = useLoader((signal) =>
   search({
-    query: query.value,
-    page: page.value,
-    sort: sort.value,
-    registratiedatumVanaf: registratiedatumVanaf.value || undefined,
-    registratiedatumTot: registratiedatumTot.value || undefined,
+    ...queryParams,
     signal
   })
 );
@@ -171,7 +225,7 @@ const pagination = computed(
   () =>
     data.value &&
     mapPaginatedResultsToUtrechtPagination({
-      page: page.value,
+      page: queryParams.page,
       pagination: data.value,
       getRoute
     })
@@ -288,7 +342,7 @@ article.search-result {
     flex-wrap: wrap;
   }
   li,
-  time {
+  :has(time) {
     font-size: 0.75em;
   }
   .category {

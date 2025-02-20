@@ -1,10 +1,10 @@
+import { addToDate, formatIsoDate } from "@/helpers";
+
 type SearchResponse = {
   results: SearchResponseItem[];
   count: number;
   next: boolean;
   previous: boolean;
-  registratiedatumVanaf?: string;
-  registratiedatumTot?: string;
 };
 
 type SearchResponseItem = {
@@ -13,6 +13,7 @@ type SearchResponseItem = {
   resultType: ResultType;
   informatieCategorieen: WaardelijstItem[];
   publisher: WaardelijstItem;
+  registratiedatum: string;
   laatstGewijzigdDatum: string;
   omschrijving: string;
 };
@@ -38,17 +39,29 @@ export type ResultType = ValueOf<typeof resultOptions>["value"];
 
 export function search({
   signal,
+  registratiedatumVanaf,
+  registratiedatumTot,
+  laatstGewijzigdDatumVanaf,
+  laatstGewijzigdDatumTot,
   ...body
 }: {
   query: string;
   page: number;
   sort: Sort;
-  registratiedatumVanaf?: string;
-  registratiedatumTot?: string;
+  registratiedatumVanaf?: string | null;
+  registratiedatumTot?: string | null;
+  laatstGewijzigdDatumVanaf?: string | null;
+  laatstGewijzigdDatumTot?: string | null;
   signal?: AbortSignal;
 }): Promise<SearchResponse> {
   return fetch("/api/zoeken", {
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      ...body,
+      registratiedatumVanaf: formatIsoDate(registratiedatumVanaf),
+      registratiedatumTot: formatIsoDate(addToDate(registratiedatumTot, { day: 1 })),
+      laatstGewijzigdDatumVanaf: formatIsoDate(laatstGewijzigdDatumVanaf),
+      laatstGewijzigdDatumTot: formatIsoDate(addToDate(laatstGewijzigdDatumTot, { day: 1 }))
+    }),
     method: "POST",
     headers: {
       "content-type": "application/json"

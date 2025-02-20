@@ -187,7 +187,7 @@ public class SearchClientMock(IHttpContextAccessor acc, ElasticsearchClient elas
                 }
                 if (request.RegistratiedatumTot.HasValue)
                 {
-                    dr.Lte(DateMath.Anchored(request.RegistratiedatumTot.Value.DateTime));
+                    dr.Lt(DateMath.Anchored(request.RegistratiedatumTot.Value.DateTime));
                 }
             }));
         }
