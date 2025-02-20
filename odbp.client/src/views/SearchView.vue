@@ -152,32 +152,34 @@ import GppWooIcon from "@/components/GppWooIcon.vue";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import UtrechtPagination from "@/components/UtrechtPagination.vue";
 import { useLoader } from "@/composables/use-loader";
-import { useSingleQueryValues } from "@/composables/use-router-query";
+import { useQueryValues, type GetSet } from "@/composables/use-router-query";
 import { useSpinner } from "@/composables/use-spinner";
 import { sortOptions, search, resultOptions } from "@/features/search/service";
 import { formatDate } from "@/helpers";
 import { mapPaginatedResultsToUtrechtPagination } from "@/helpers/pagination";
+import { truncate } from "@/helpers/strings";
 import { computed, onMounted, reactive } from "vue";
 import { useRoute, type RouteLocationRaw } from "vue-router";
 
 const route = useRoute();
+const single = <T,>(v: T[]) => v[0];
 
-const unmapped = <T,>(v: T) => v;
+const singleNumber: GetSet<number> = {
+  get: (x) => +(x[0] || "1"),
+  set: (x) => x.toString()
+};
 
-const queryParams = useSingleQueryValues({
-  query: unmapped,
-  registratiedatumVanaf: unmapped,
-  registratiedatumTot: unmapped,
-  laatstGewijzigdDatumVanaf: unmapped,
-  laatstGewijzigdDatumTot: unmapped,
+const queryParams = useQueryValues({
+  query: single,
+  registratiedatumVanaf: single,
+  registratiedatumTot: single,
+  laatstGewijzigdDatumVanaf: single,
+  laatstGewijzigdDatumTot: single,
   sort: (x) =>
-    x === sortOptions.chronological.value
+    x[0] === sortOptions.chronological.value
       ? sortOptions.chronological.value
       : sortOptions.relevance.value,
-  page: {
-    get: (x) => +(x || "1"),
-    set: (x) => (x as number).toString()
-  }
+  page: singleNumber
 });
 
 const formFields = reactive({
@@ -188,10 +190,8 @@ const formFields = reactive({
   laatstGewijzigdDatumTot: ""
 });
 
-type FormKeys = keyof typeof formFields;
-
 onMounted(() => {
-  const keys = Object.keys(formFields) as FormKeys[];
+  const keys = Object.keys(formFields) as Array<keyof typeof formFields>;
   keys.forEach((key) => (formFields[key] = queryParams[key]));
 });
 
@@ -228,11 +228,6 @@ const pagination = computed(
       getRoute
     })
 );
-
-const truncate = (s: string, ch: number) => {
-  if (s.length <= ch) return s;
-  return s.substring(0, ch) + "...";
-};
 </script>
 
 <style lang="scss" scoped>

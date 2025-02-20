@@ -1,18 +1,16 @@
-import { type WritableComputedRef, computed, reactive, watch, watchEffect } from "vue";
-import { useRouter } from "vue-router";
+import { reactive, watch } from "vue";
+import { useRouter, type LocationQueryValue } from "vue-router";
 
-const first = <T>(v: T | T[]) => (Array.isArray(v) ? v[0] : v);
+type SingleOrMultiple = LocationQueryValue | LocationQueryValue[];
 
-type QueryValue = string | null;
-
-type GetSet<O> = {
-  get: (v: QueryValue) => O;
-  set: (v: O) => QueryValue;
+export type GetSet<O> = {
+  get: (v: LocationQueryValue[]) => O;
+  set: (v: O) => SingleOrMultiple;
 };
 
-type Get<O extends QueryValue> = (v: QueryValue) => O;
+type Get<O extends SingleOrMultiple> = (v: LocationQueryValue[]) => O;
 
-type InputRecord = Record<string, Get<QueryValue> | GetSet<unknown>>;
+type InputRecord = Record<string, Get<SingleOrMultiple> | GetSet<any>>;
 
 type GetOutput<T> = T extends GetSet<infer O> ? O : T extends Get<infer O> ? O : never;
 
@@ -20,7 +18,7 @@ type GetOutputRecord<T extends InputRecord> = {
   [K in keyof T]: T[K] extends GetOutput<infer O> ? O : never;
 };
 
-export function useSingleQueryValues<T extends InputRecord>(dict: T): GetOutputRecord<T> {
+export function useQueryValues<T extends InputRecord>(dict: T): GetOutputRecord<T> {
   const router = useRouter();
   const keys = Object.keys(dict) as Array<keyof T & string>;
 
@@ -33,11 +31,12 @@ export function useSingleQueryValues<T extends InputRecord>(dict: T): GetOutputR
         obj,
         Object.fromEntries(
           keys.map((key) => {
-            const transformer = dict[key] as Get<QueryValue> | GetSet<any>;
-            const routeValue = first(route.query[key]);
+            const transformer = dict[key] as Get<SingleOrMultiple> | GetSet<any>;
+            const routeValue = route.query[key];
             const transformerFunction =
               typeof transformer === "function" ? transformer : transformer.get;
-            const mappedValue = transformerFunction(routeValue);
+            const routeValueArr = Array.isArray(routeValue) ? routeValue : [routeValue];
+            const mappedValue = transformerFunction(routeValueArr);
             return [key, mappedValue];
           })
         )
@@ -51,41 +50,15 @@ export function useSingleQueryValues<T extends InputRecord>(dict: T): GetOutputR
     (entries) =>
       router.push({
         path: router.currentRoute.value.path,
-        query: {
-          ...router.currentRoute.value.query,
-          ...Object.fromEntries(
-            entries.map(([key, value]) => {
-              const transformer = dict[key] as Get<QueryValue> | GetSet<any>;
-              const mappedValue =
-                typeof transformer === "function" ? value : transformer.set(value);
-              return [key, mappedValue];
-            })
-          )
-        }
+        query: Object.fromEntries(
+          entries.map(([key, value]) => {
+            const transformer = dict[key] as Get<QueryValue> | GetSet<any>;
+            const mappedValue = typeof transformer === "function" ? value : transformer.set(value);
+            return [key, mappedValue];
+          })
+        )
       })
   );
 
   return obj;
-}
-
-export function useRouterQuerySingle<T extends string | number | null>(
-  key: string,
-  transform: (v: string | null) => T
-): WritableComputedRef<T> {
-  const router = useRouter();
-  return computed({
-    get() {
-      return transform(first(router.currentRoute.value.query[key]));
-    },
-    set(v) {
-      const { path, query } = router.currentRoute.value;
-      router.push({
-        path,
-        query: {
-          ...query,
-          [key]: v?.toString()
-        }
-      });
-    }
-  });
 }
