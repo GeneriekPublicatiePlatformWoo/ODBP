@@ -1,117 +1,112 @@
 <template>
-  <utrecht-article>
-    <utrecht-heading :level="1">Zoeken</utrecht-heading>
+  <utrecht-heading :level="1">Zoeken</utrecht-heading>
 
-    <div class="zoeken-page">
-      <form class="utrecht-form" @submit.prevent.stop="submit">
-        <utrecht-fieldset class="zoeken">
-          <utrecht-form-field
-            ><utrecht-form-label
-              for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
-              aria-hidden="true"
-              hidden
-              >Zoekterm</utrecht-form-label
-            >
-            <utrecht-textbox
-              id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
-              aria-placeholder="Hier zoeken"
-              placeholder="Hier zoeken"
-              v-model="zoekVeld"
-              type="search"
-              autocomplete="off"
-              spelcheck="false"
-              enterkeyhint="search"
-              @search="submit"
-          /></utrecht-form-field>
+  <div class="zoeken-page">
+    <form class="utrecht-form" @submit.prevent.stop="submit">
+      <utrecht-fieldset class="zoeken">
+        <utrecht-form-field class="search-bar"
+          ><utrecht-form-label for="92eb76ee-c52f-4dc2-b3db-257ab2cba897" aria-hidden="true" hidden
+            >Zoekterm</utrecht-form-label
+          >
+          <utrecht-textbox
+            id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
+            aria-placeholder="Hier zoeken"
+            placeholder="Hier zoeken"
+            v-model="zoekVeld"
+            type="search"
+            autocomplete="off"
+            spelcheck="false"
+            enterkeyhint="search"
+            @search="submit"
+          />
           <utrecht-button type="submit" :appearance="'primary-action-button'"
             >Zoeken</utrecht-button
           >
-          <utrecht-form-field
-            ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
-              >Sorteren</utrecht-form-label
-            >
-            <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
-            <gpp-woo-icon icon="sort" />
-          </utrecht-form-field>
-        </utrecht-fieldset>
-        <utrecht-fieldset class="filters">
-          <!-- <utrecht-legend>Filters</utrecht-legend> -->
-          <utrecht-form-field
-            ><utrecht-form-label for="registration-date-from"
-              >Registratiedatum vanaf</utrecht-form-label
-            >
-            <utrecht-textbox
-              id="registration-date-from"
-              v-model="registratiedatumVanaf"
-              type="date"
-            />
-          </utrecht-form-field>
-          <utrecht-form-field
-            ><utrecht-form-label for="registration-date-until"
-              >Registratiedatum tot en met</utrecht-form-label
-            >
-            <utrecht-textbox
-              id="registration-date-until"
-              v-model="registratiedatumTot"
-              type="date"
-            />
-          </utrecht-form-field>
-        </utrecht-fieldset>
-      </form>
+        </utrecht-form-field>
 
-      <div class="results">
-        <simple-spinner v-if="showSpinner" />
-        <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
-        <template v-else-if="data">
-          <div v-if="data.results.length">
-            <p class="result-count">{{ data.count }} gevonden</p>
-            <ol>
-              <li
-                v-for="(
-                  {
-                    uuid,
-                    officieleTitel,
-                    resultType,
-                    informatieCategorieen,
-                    publisher,
-                    laatstGewijzigdDatum,
-                    omschrijving
-                  },
-                  idx
-                ) in data.results"
-                :key="uuid + idx"
-              >
-                <article class="search-result">
-                  <utrecht-heading :level="3">
-                    <router-link
-                      :to="`/${resultType === resultOptions.document.value ? 'documenten' : 'publicaties'}/${uuid}`"
-                    >
-                      {{ officieleTitel }}
-                    </router-link>
-                  </utrecht-heading>
-                  <ul>
-                    <li>
-                      <strong>{{ resultOptions[resultType].label }}</strong>
-                    </li>
-                    <li>{{ publisher.name }}</li>
-                    <li v-for="categorie in informatieCategorieen" :key="categorie.uuid">
-                      {{ categorie.name }}
-                    </li>
-                  </ul>
-                  <p>{{ truncate(omschrijving, 150) }}</p>
-                  <time :datetime="laatstGewijzigdDatum">{{
-                    formatDate(laatstGewijzigdDatum)
-                  }}</time>
-                </article>
-              </li>
-            </ol>
-            <utrecht-pagination v-if="pagination" v-bind="pagination" class="pagination" />
-          </div>
-          <p v-else>Geen resultaten gevonden</p>
-        </template>
-      </div>
+        <utrecht-form-field
+          ><utrecht-form-label for="sort-select" aria-hidden="true" hidden
+            >Sorteren</utrecht-form-label
+          >
+          <utrecht-select id="sort-select" v-model="sort" :options="Object.values(sortOptions)" />
+          <gpp-woo-icon icon="sort" />
+        </utrecht-form-field>
+      </utrecht-fieldset>
+      <utrecht-fieldset class="filters">
+        <!-- <utrecht-legend>Filters</utrecht-legend> -->
+        <utrecht-form-field
+          ><utrecht-form-label for="registration-date-from"
+            >Registratiedatum vanaf</utrecht-form-label
+          >
+          <utrecht-textbox
+            id="registration-date-from"
+            v-model="registratiedatumVanaf"
+            type="date"
+          />
+        </utrecht-form-field>
+        <utrecht-form-field
+          ><utrecht-form-label for="registration-date-until"
+            >Registratiedatum tot en met</utrecht-form-label
+          >
+          <utrecht-textbox id="registration-date-until" v-model="registratiedatumTot" type="date" />
+        </utrecht-form-field>
+      </utrecht-fieldset>
+    </form>
+
+    <div class="results">
+      <simple-spinner v-if="showSpinner" />
+      <p v-else-if="error">Er ging iets mis. Probeer het opnieuw.</p>
+      <template v-else-if="data">
+        <div v-if="data.results.length">
+          <p class="result-count">{{ data.count }} resultaten gevonden</p>
+          <ol>
+            <li
+              v-for="(
+                {
+                  uuid,
+                  officieleTitel,
+                  resultType,
+                  informatieCategorieen,
+                  publisher,
+                  laatstGewijzigdDatum,
+                  omschrijving
+                },
+                idx
+              ) in data.results"
+              :key="uuid + idx"
+            >
+              <utrecht-article class="search-result">
+                <utrecht-heading :level="3">
+                  <router-link
+                    :to="`/${resultType === resultOptions.document.value ? 'documenten' : 'publicaties'}/${uuid}`"
+                  >
+                    {{ officieleTitel }}
+                  </router-link>
+                </utrecht-heading>
+                <ul>
+                  <li class="result-type">
+                    <strong>{{ resultOptions[resultType].label }}</strong>
+                  </li>
+                  <li class="publisher">{{ publisher.name }}</li>
+                  <li
+                    class="category"
+                    v-for="categorie in informatieCategorieen"
+                    :key="categorie.uuid"
+                  >
+                    {{ categorie.name }}
+                  </li>
+                </ul>
+                <utrecht-paragraph>{{ truncate(omschrijving, 150) }}</utrecht-paragraph>
+                <time :datetime="laatstGewijzigdDatum">{{ formatDate(laatstGewijzigdDatum) }}</time>
+              </utrecht-article>
+            </li>
+          </ol>
+          <utrecht-pagination v-if="pagination" v-bind="pagination" class="pagination" />
+        </div>
+        <p v-else>Geen resultaten gevonden</p>
+      </template>
     </div>
-  </utrecht-article>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -190,7 +185,7 @@ const truncate = (s: string, ch: number) => {
 <style lang="scss" scoped>
 .zoeken-page {
   display: grid;
-  grid-template-columns: minmax(14rem, 1fr) minmax(var(--utrecht-article-max-inline-size), 1fr);
+  grid-template-columns: 14rem 1fr;
   grid-template-rows: auto 1fr;
   column-gap: calc(2 * var(--utrecht-space-inline-md));
 
@@ -237,17 +232,19 @@ const truncate = (s: string, ch: number) => {
 
 .zoeken > :first-child {
   --_gap: calc(var(--utrecht-space-inline-md) * 2);
-  gap: var(--_gap);
+  column-gap: var(--_gap);
   display: flex;
   align-items: center;
-
-  button {
-    margin-inline-start: calc(-2 * var(--utrecht-space-inline-md));
-  }
+  flex-wrap: wrap;
 
   input {
     max-inline-size: 100%;
     inline-size: 20rem;
+  }
+
+  .search-bar {
+    display: flex;
+    flex-wrap: wrap;
   }
 }
 
@@ -282,11 +279,16 @@ article.search-result {
   ul {
     display: flex;
     column-gap: var(--utrecht-space-inline-xs);
+    row-gap: var(--utrecht-space-inline-2xs);
+    align-items: center;
     flex-wrap: wrap;
   }
   li,
   time {
     font-size: 0.75em;
+  }
+  .category {
+    border-bottom: 1px dotted lightgray;
   }
   p {
     margin: 0;
