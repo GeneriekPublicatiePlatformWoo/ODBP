@@ -185,7 +185,7 @@ const truncate = (s: string, ch: number) => {
 <style lang="scss" scoped>
 .zoeken-page {
   display: grid;
-  grid-template-columns: 14rem 1fr;
+  grid-template-columns: minmax(auto, 14rem) 1fr;
   grid-template-rows: auto 1fr;
   column-gap: calc(2 * var(--utrecht-space-inline-md));
 
@@ -231,11 +231,11 @@ const truncate = (s: string, ch: number) => {
 }
 
 .zoeken > :first-child {
-  --_gap: calc(var(--utrecht-space-inline-md) * 2);
-  column-gap: var(--_gap);
+  column-gap: calc(var(--utrecht-space-inline-md) * 2);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: space-between;
 
   input {
     max-inline-size: 100%;
