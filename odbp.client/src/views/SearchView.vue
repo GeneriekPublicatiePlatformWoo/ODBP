@@ -4,12 +4,10 @@
     <form class="utrecht-form" @submit.prevent.stop="submit">
       <utrecht-fieldset class="zoeken">
         <utrecht-form-field
-          ><utrecht-form-label for="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
-            >Zoekterm</utrecht-form-label
-          >
+          ><utrecht-form-label for="search-field">Zoekterm</utrecht-form-label>
           <div class="search-bar">
             <utrecht-textbox
-              id="92eb76ee-c52f-4dc2-b3db-257ab2cba897"
+              id="search-field"
               aria-placeholder="Hier zoeken"
               placeholder="Hier zoeken"
               v-model="formFields.query"
