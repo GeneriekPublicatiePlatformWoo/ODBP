@@ -34,32 +34,29 @@ export function mapPaginatedResultsToUtrechtPagination<T>({
     number: i
   });
 
-  // we want to show a maximum of 4 pages, but the current page will not always be in the middle
-  const max = 4;
+  const links = [];
+
+  // we want to show a maximum of 7 pages, but the current page will not always be in the middle
+  const max = 7;
+  const maxDynamicCount = max - 2;
 
   let lower = page;
   let upper = lower;
 
   // thats why we want to calculate the minimum and maximum page here
-  while (upper - lower < max && (lower > 1 || totalPages > upper)) {
-    lower = Math.max(1, lower - 1);
-    upper = Math.min(totalPages, upper + 1);
+  while (upper - lower < maxDynamicCount - 1 && (lower > 2 || totalPages > upper)) {
+    lower = Math.max(2, lower - 1);
+    upper = Math.min(totalPages - 1, upper + 1);
   }
 
-  const links = [];
-
-  if (lower > 1) {
-    links.push(getLink(1));
-  }
+  links.push(getLink(1));
 
   for (let index = 0; index <= upper - lower; index++) {
     const number = index + lower;
     links.push(getLink(number));
   }
 
-  if (totalPages > upper) {
-    links.push(getLink(totalPages));
-  }
+  links.push(getLink(totalPages));
 
   return {
     links,
