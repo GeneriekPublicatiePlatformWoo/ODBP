@@ -66,4 +66,8 @@ defineProps<UtrechtPaginationProps>();
   min-inline-size: 19ch;
   display: inline-block;
 }
+.utrecht-pagination__page-link {
+  min-inline-size: 2ch;
+  text-align: center;
+}
 </style>
