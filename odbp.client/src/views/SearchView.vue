@@ -284,6 +284,10 @@ const pagination = computed(
   }
 }
 
+input {
+  block-size: 2.5rem; // date and text inputs are not the same height otherwise...
+}
+
 .zoeken > :first-child {
   column-gap: calc(var(--utrecht-space-inline-md) * 2);
   display: flex;
